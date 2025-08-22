@@ -13,7 +13,7 @@ REP_R_JSON="$BASE_R_DIR/train-R_with_rephrased.json"
 REP_R_EVAL_JSON="$BASE_R_DIR/train-R_with_rephrased-eval.json"
 
 echo "[Constructing preference dataset] Split: train"
-python scripts/construct_dataset.py \
+python tools/construct_dataset.py \
     --json_path "$REP_R_JSON" \
     --base_dir "$REP_R_DATA_DIR" \
     --ckpt_dir "$DET_MODEL_CKPT" \
@@ -21,7 +21,7 @@ python scripts/construct_dataset.py \
 
 
 echo "[Constructing preference dataset] Split: test"
-python scripts/construct_dataset.py \
+python tools/construct_dataset.py \
     --json_path "$REP_R_EVAL_JSON" \
     --base_dir "$REP_R_DATA_EVAL_DIR" \
     --ckpt_dir "$DET_MODEL_CKPT" \
@@ -29,5 +29,5 @@ python scripts/construct_dataset.py \
 
 
 echo "[Saving dataset dictionary]"
-python scripts/create_dataset_dict.py \
+python tools/create_dataset_dict.py \
     --json_path "$PREF_DATA_DIR/dataset_dict.json"

@@ -18,7 +18,7 @@ CONFIG_NAMES=(
 for CONFIG_NAME in "${CONFIG_NAMES[@]}"; do
     echo "Running training for: $CONFIG_NAME on devices: $DEVICES"
 
-    python -m torch.distributed.run --nproc_per_node=4 --master_port "$PORT" scripts/train_base_detector.py \
+    python -m torch.distributed.run --nproc_per_node=4 --master_port "$PORT" tools/train_base_detector.py \
         --project-name fisheye_od_yolo \
         --run-name "yolo11s_$CONFIG_NAME" \
         --yaml-file "config/ultralytics/$CONFIG_NAME.yaml" \

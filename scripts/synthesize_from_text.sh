@@ -29,7 +29,7 @@ REP_R_DATA_EVAL_DIR="$REP_R_DATA_DIR-eval"
 
 
 echo "[Generating images] Output: $NAV_V0_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$CAP_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -38,7 +38,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $NAV_V1_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$CAP_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -47,7 +47,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $NAV_V2_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$CAP_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -56,7 +56,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $MAN_V1_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$MAN_V1_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -64,7 +64,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $MAN_V2_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$MAN_V2_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -72,7 +72,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $AUT_V1_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$AUT_V1_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -80,7 +80,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $AUT_V2_D_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$AUT_V2_D_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -88,7 +88,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $REP_R_DATA_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$REP_R_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \
@@ -96,7 +96,7 @@ accelerate launch --multi_gpu scripts/synthesize_from_text.py \
 
 
 echo "[Generating images] Output: $REP_R_DATA_EVAL_DIR"
-accelerate launch --multi_gpu scripts/synthesize_from_text.py \
+accelerate launch --multi_gpu tools/synthesize_from_text.py \
     --model_name "$GEN_MODEL" \
     --json_path "$REP_R_EVAL_JSON" \
     --ckpt_dir "$GEN_MODEL_CKPT" \

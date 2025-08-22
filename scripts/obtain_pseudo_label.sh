@@ -30,7 +30,7 @@ REP_R_DATA_EVAL_DIR="$REP_R_DATA_DIR-eval"
 REP_R_PSEUDO_EVAL_JSON="$REP_R_DATA_EVAL_DIR/train-R_rephrased-gen-eval_with_pseudolabel.json"
 
 echo "[Pseudo-labeling images] Data: naive_v0-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_naive_v0-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -38,12 +38,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: naive_v0-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$NAV_V0_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: naive_v1-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_naive_v1-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -51,12 +51,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: naive_v1-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$NAV_V1_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: naive_v2-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_naive_v2-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -64,12 +64,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: naive_v2-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$NAV_V2_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: manual_v1-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_manual_v1-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -77,12 +77,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: manual_v1-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$MAN_V1_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: manual_v2-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_manual_v2-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -90,12 +90,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: manual_v2-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$MAN_V2_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: automatic_v1-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_automatic_v1-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -103,12 +103,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: automatic_v1-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$AUT_V1_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: automatic_v2-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_automatic_v2-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -116,12 +116,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: automatic_v2-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$AUT_V2_D_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: rephrased-gen"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_rephrased-gen.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -129,12 +129,12 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: rephrased-gen"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$REP_R_DATA_DIR"
 
 
 echo "[Pseudo-labeling images] Data: rephrased-gen-eval"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_rephrased-gen-eval.py \
     "$CHECKPOINT" \
     "$OPT_CONF_JSON" \
@@ -142,5 +142,5 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Converting annotations] Data: rephrased-gen-eval"
-python scripts/convert_coco_to_yolo.py \
+python tools/convert_coco_to_yolo.py \
     --base_dir "$REP_R_DATA_EVAL_DIR"

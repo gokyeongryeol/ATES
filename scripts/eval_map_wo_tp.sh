@@ -14,7 +14,7 @@ CONFIG_NAMES=(
 for CONFIG_NAME in "${CONFIG_NAMES[@]}"; do
     echo "Running evaluation for: $CONFIG_NAME"
 
-    python scripts/eval_map_wo_tp.py \
+    python tools/eval_map_wo_tp.py \
         --model_path "ckpt/yolo/yolo11s_$CONFIG_NAME/weights/best.pt" \
         --data_yaml "config/ultralytics/$CONFIG_NAME.yaml" \
         --save_json "ckpt/yolo/yolo11s_$CONFIG_NAME/result.json" \

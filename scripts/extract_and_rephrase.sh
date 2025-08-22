@@ -22,7 +22,7 @@ REP_R_JSON="$BASE_R_DIR/train-R_with_rephrased.json"
 REP_R_EVAL_JSON="$BASE_R_DIR/train-R_with_rephrased-eval.json"
 
 echo "[Extracting captions] Model: $CAPTION_MODEL"
-accelerate launch --multi_gpu scripts/extract_caption.py \
+accelerate launch --multi_gpu tools/extract_caption.py \
     --model_name "$CAPTION_MODEL" \
     --base_dir "$BASE_D_DIR" \
     --json_path "$GT_D_JSON" \
@@ -30,7 +30,7 @@ accelerate launch --multi_gpu scripts/extract_caption.py \
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With MANAUL_V1_PROMPT"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_D_JSON" \
     --output_path "$MAN_V1_D_JSON" \
@@ -38,7 +38,7 @@ accelerate launch --multi_gpu scripts/rephrase_caption.py \
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With MANAUL_V2_PROMPT"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_D_JSON" \
     --output_path "$MAN_V2_D_JSON" \
@@ -46,7 +46,7 @@ accelerate launch --multi_gpu scripts/rephrase_caption.py \
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With AUTOMATIC_V1_PROMPT"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_D_JSON" \
     --output_path "$AUT_V1_D_JSON" \
@@ -54,7 +54,7 @@ accelerate launch --multi_gpu scripts/rephrase_caption.py \
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With AUTOMATIC_V2_PROMPT"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_D_JSON" \
     --output_path "$AUT_V2_D_JSON" \
@@ -62,7 +62,7 @@ accelerate launch --multi_gpu scripts/rephrase_caption.py \
 
 
 echo "[Extracting captions] Model: $CAPTION_MODEL"
-accelerate launch --multi_gpu scripts/extract_caption.py \
+accelerate launch --multi_gpu tools/extract_caption.py \
     --model_name "$CAPTION_MODEL" \
     --base_dir "$BASE_R_DIR" \
     --json_path "$GT_R_JSON" \
@@ -70,14 +70,14 @@ accelerate launch --multi_gpu scripts/extract_caption.py \
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With DIVERSE_PROMPT. Split: train"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_R_JSON" \
     --output_path "$REP_R_JSON"
 
 
 echo "[Rephrasing captions] Model: $REPHRASE_MODEL. With DIVERSE_PROMPT. Split: test"
-accelerate launch --multi_gpu scripts/rephrase_caption.py \
+accelerate launch --multi_gpu tools/rephrase_caption.py \
     --model_name "$REPHRASE_MODEL" \
     --json_path "$CAP_R_JSON" \
     --output_path "$REP_R_EVAL_JSON"

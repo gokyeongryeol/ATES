@@ -10,7 +10,7 @@ NAIVE_R_JSON="$BASE_R_DIR/train-R_with_naive_pseudolabel.json"
 OPT_CONF_JSON="$BASE_R_DIR/opt_conf_thr.json"
 
 echo "[Obtaining naive prediction] Output: $NAIVE_R_JSON"
-python scripts/obtain_pseudo_label.py \
+python tools/obtain_pseudo_label.py \
     config/mmdetection/fisheye8k_pl_for_gt.py \
     "$CHECKPOINT" \
     "" \
@@ -18,7 +18,7 @@ python scripts/obtain_pseudo_label.py \
 
 
 echo "[Estimating optimal threshold] Output: $OPT_CONF_JSON"
-python scripts/estimate_optimal_threshold.py \
+python tools/estimate_optimal_threshold.py \
     --gt_json "$GT_R_JSON" \
     --pred_json "$NAIVE_R_JSON" \
     --save_json "$OPT_CONF_JSON"
