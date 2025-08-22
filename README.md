@@ -1,4 +1,4 @@
-# Describe edge-case
+# Automatic Text-guided Edge-case Synthesis (ATES)
 
 ## Preparation
 
