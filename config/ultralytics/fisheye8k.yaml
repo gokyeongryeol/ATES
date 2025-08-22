@@ -1,0 +1,10 @@
+names:
+- Bus
+- Bike
+- Car
+- Pedestrian
+- Truck
+nc: 5
+train: /mnt/nas-1/data/FishEyeChallenge/FishEye8K/train-D/images
+val: /mnt/nas-1/data/FishEyeChallenge/FishEye8K/test/images
+val_json: /mnt/nas-1/data/FishEyeChallenge/FishEye8K/test/test.json

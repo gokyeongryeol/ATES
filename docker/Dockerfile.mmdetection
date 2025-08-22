@@ -1,0 +1,31 @@
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
+
+# Install the required packages
+RUN apt-get update \
+    && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install -U pip setuptools wheel ninja
+
+# Install MMEngine
+RUN pip install openmim && \
+    mim install "mmengine>=0.7.1"
+
+ENV MMCV_WITH_OPS=1
+ENV FORCE_CUDA=1
+ENV TORCH_CUDA_ARCH_LIST="6.0;6.1;7.0;7.2;7.5;8.0;8.6;8.9;9.0a"
+
+# Install MMCV
+RUN git clone https://github.com/open-mmlab/mmcv.git /mmcv \
+    && cd /mmcv \
+    && pip install -r requirements/optional.txt \
+    && pip install -e . -v
+
+RUN pip install wandb
+
+# Install MMDetection
+RUN conda clean --all \
+    && git clone https://github.com/open-mmlab/mmdetection.git /mmdetection \
+    && cd /mmdetection \
+    && pip install --no-cache-dir -e .

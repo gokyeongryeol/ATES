@@ -1,0 +1,20 @@
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
+
+# Install the required packages
+RUN apt-get update \
+    && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install -U pip setuptools wheel ninja
+
+RUN pip install "huggingface_hub[cli]"
+
+RUN pip install wandb
+
+# Install trl
+RUN git clone https://github.com/huggingface/trl.git /trl \
+    && cd /trl \
+    && pip install --no-cache-dir -e .
+
+RUN pip install -U peft

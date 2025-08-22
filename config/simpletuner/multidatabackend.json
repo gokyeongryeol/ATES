@@ -1,0 +1,22 @@
+[
+    {
+        "id": "fisheye",
+        "type": "local",
+        "instance_data_dir": "/mnt/nas-1/data/FishEyeChallenge/FishEye8K/train-D_for_gen/images",
+        "crop": false,
+        "resolution": 1024,
+        "resolution_type": "pixel_area",
+        "caption_strategy": "textfile",
+        "cache_dir_vae": "cache/flux/fisheye/vae",
+        "text_embeds": "fisheye-text-embeds",
+        "preserve_data_backend_cache": true
+    },
+    {
+        "id": "fisheye-text-embeds",
+        "dataset_type": "text_embeds",
+        "default": true,
+        "type": "local",
+        "cache_dir": "cache/flux/fisheye/text",
+        "preserve_data_backend_cache": true
+    }
+]

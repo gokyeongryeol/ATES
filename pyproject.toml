@@ -1,0 +1,15 @@
+[project]
+name = "ultralytics_custom"
+version = "0.1.0"
+description = "Automatic Text-guided Edge-case Synthesis (ATES)"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pycocotools>=2.0.10",
+    "ultralytics==8.3.155",
+    "transformers==4.50.3",
+    "accelerate==1.5.2",
+    "diffusers==0.34.0",
+    "wandb>=0.20.1",
+    "flash-attn==2.8.2",
+]

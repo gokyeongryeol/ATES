@@ -1,0 +1,9 @@
+[submodule "external/SimpleTuner"]
+	path = external/SimpleTuner
+	url = https://github.com/bghira/SimpleTuner.git
+[submodule "external/mmdetection"]
+	path = external/mmdetection
+	url = https://github.com/open-mmlab/mmdetection.git
+[submodule "external/trl"]
+	path = external/trl
+	url = https://github.com/huggingface/trl.git
