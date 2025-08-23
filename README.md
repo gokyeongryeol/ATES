@@ -19,7 +19,6 @@ docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name e
 
 To be used to train Flux.1-dev
 ```bash
-cd docker
 docker build -t img-gen -f Dockerfile.simpletuner .
 docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name edge_gen_lab img-gen /bin/bash
 ```
@@ -104,7 +103,7 @@ Update line 124-128 of `external/trl/trl/scripts/dpo.py` to
 
 ```python
 from datasets import load_from_disk
-dataset = load_from_disk(script_args.dataset_name)`
+dataset = load_from_disk(script_args.dataset_name)
 ```
 
 Train LLAMA3
