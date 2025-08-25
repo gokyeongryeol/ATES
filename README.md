@@ -158,7 +158,7 @@
 
 
 ### 6. Augment the train dataset with the tuned rephraser
-- Go back to Step 2,3,4 uncommenting scripts for "automatic_v1"
+- Go back to Step 2,3,4 uncommenting scripts for "automatic_v1" and commenting others
 
 
 ### 7. Evaluate the augmented train dataset
