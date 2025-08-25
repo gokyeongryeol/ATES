@@ -3,12 +3,7 @@ set -e
 
 
 CONFIG_NAMES=(
-    "fisheye8k_with_naive_v0+naive_v1"
-    "fisheye8k_with_naive_v0+manual_v1"
     "fisheye8k_with_naive_v0+automatic_v1"
-    "fisheye8k_with_naive_v0+naive_v1+naive_v2"
-    "fisheye8k_with_naive_v0+manual_v1+manual_v2"
-    "fisheye8k_with_naive_v0+automatic_v1+automatic_v2"
 )
 
 for CONFIG_NAME in "${CONFIG_NAMES[@]}"; do
@@ -19,5 +14,5 @@ for CONFIG_NAME in "${CONFIG_NAMES[@]}"; do
         --data_yaml "config/ultralytics/$CONFIG_NAME.yaml" \
         --save_json "ckpt/yolo/yolo11s_$CONFIG_NAME/result.json" \
         --imgsz 1280 \
-        --ref_model_path "ckpt/yolo/yolo11s_fisheye8k_with_naive_v0/weights/best.pt"
+        # --ref_model_path "ckpt/yolo/yolo11s_fisheye8k_with_naive_v0/weights/best.pt"  # UNCOMMENT for mAP w/o TP
 done

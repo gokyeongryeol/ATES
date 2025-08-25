@@ -12,6 +12,7 @@ REP_R_DATA_EVAL_DIR="$REP_R_DATA_DIR-eval"
 REP_R_JSON="$BASE_R_DIR/train-R_with_rephrased.json"
 REP_R_EVAL_JSON="$BASE_R_DIR/train-R_with_rephrased-eval.json"
 
+
 echo "[Constructing preference dataset] Split: train"
 python tools/construct_dataset.py \
     --json_path "$REP_R_JSON" \
