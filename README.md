@@ -21,7 +21,7 @@
     ```
 
 
-- Make separate container
+- Make separate containers
 
     -  To be used to train Co-DETR
 
