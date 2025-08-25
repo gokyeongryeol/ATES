@@ -95,25 +95,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    import os
-    import requests
-    import traceback
-
-    local_rank = int(os.environ.get("LOCAL_RANK", -1))
-    try:
-        main(args)
-
-        if os.environ.get("SLACK_ALARM_URL", None) and local_rank in [0, -1]:
-            requests.post(
-                os.environ["SLACK_ALARM_URL"], json={"text": "Train finished."}
-            )
-
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
-
-        if os.environ.get("SLACK_ALARM_URL", None) and local_rank in [0, -1]:
-            requests.post(
-                os.environ["SLACK_ALARM_URL"],
-                json={"text": f"Training has failed: {e}"},
-            )
+    main(args)
