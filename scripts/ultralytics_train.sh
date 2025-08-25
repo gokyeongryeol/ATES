@@ -8,7 +8,6 @@ CONFIG_NAMES=(
     "fisheye8k"
     "fisheye8k_with_naive_v0"
     # "fisheye8k_with_naive_v0+automatic_v1"
-    # "fisheye8k_with_naive_v0+automatic_v1+automatic_v2"
 )
 
 for CONFIG_NAME in "${CONFIG_NAMES[@]}"; do

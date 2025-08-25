@@ -17,8 +17,6 @@ REP_R_DATA_EVAL_DIR="$REP_R_DATA_DIR-eval"
 
 # AUT_V1_D_JSON="$BASE_D_DIR/train-D_with_automatic_v1.json"
 # AUT_V1_D_DATA_DIR="$DATA_DIR/train-D_automatic_v1-gen"
-# AUT_V2_D_JSON="$BASE_D_DIR/train-D_with_automatic_v2.json"
-# AUT_V2_D_DATA_DIR="$DATA_DIR/train-D_automatic_v2-gen"
 
 
 echo "[Generating images] Output: $NAV_V0_D_DATA_DIR"
@@ -52,11 +50,3 @@ accelerate launch --multi_gpu tools/synthesize_from_text.py \
 #     --json_path "$AUT_V1_D_JSON" \
 #     --ckpt_dir "$GEN_MODEL_CKPT" \
 #     --output_dir "$AUT_V1_D_DATA_DIR"
-
-
-# echo "[Generating images] Output: $AUT_V2_D_DATA_DIR"
-# accelerate launch --multi_gpu tools/synthesize_from_text.py \
-#     --model_name "$GEN_MODEL" \
-#     --json_path "$AUT_V2_D_JSON" \
-#     --ckpt_dir "$GEN_MODEL_CKPT" \
-#     --output_dir "$AUT_V2_D_DATA_DIR"

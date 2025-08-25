@@ -4,9 +4,11 @@
 
 ### 1. Install
 
-```bash
-pip install -e .
-```
+- Download and setup with an editable mode
+    ```bash
+    pip install -e .
+    ```
+- Substitute default config file of `ultralytics` to `src/ultralytics_custom/cfg/default_backup.yaml`
 
 
 ### 2. Submodules
@@ -47,7 +49,13 @@ pip install -e .
 
 ## Experiment
 
-### 1. Train a high-quality pseudo-labeler
+### 1. Train a high-quality pseudo-labeler with edge_pseudo_lab
+- Switch to `edge_pseudo_lab`
+    ```bash
+    docker exec -it edge_pseudo_lab bash
+    ```
+
+
 - Download the pretrained ckpt
 
     ```bash
@@ -85,6 +93,12 @@ pip install -e .
 
 
 ### 3. Synthesize images from captions
+- Switch to `edge_gen_lab`
+    ```bash
+    docker exec -it edge_gen_lab bash
+    ```
+
+
 - Train Flux.1-dev
 
     ```bash
@@ -122,6 +136,12 @@ pip install -e .
 
 
 ### 5. Apply preference learning to rephraser
+- Switch to `edge_rephrase_lab`
+    ```bash
+    docker exec -it edge_rephrase_lab bash
+    ```
+
+
 - Update data loading codes of `external/trl/trl/scripts/dpo.py` to
 
     ```python
@@ -134,4 +154,16 @@ pip install -e .
 
     ```bash
     bash scripts/trl_train.sh
+    ```
+
+
+### 6. Augment the train dataset with the tuned rephraser
+- Go back to Step 2,3,4 uncommenting scripts for "automatic_v1"
+
+
+### 7. Evaluate the augmented train dataset
+- Compute mAP or mAP w/o TP
+
+    ```bash
+    bash scripts/eval_metrics.sh
     ```
