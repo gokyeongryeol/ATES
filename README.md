@@ -5,7 +5,7 @@
 ### 1. Dataset
 - Download [FishEye8K](https://scidm.nchc.org.tw/en/dataset/fisheye8k) dataset and place it into `/mnt/data/FishEye8K/`
 
-- Split `train` of `/mnt/data/FishEye8K/` into `train-D` and `train-R` based on camera IDs referred from file names
+- Split `train` of `/mnt/data/FishEye8K/` into `train-D` and `train-R` based on camera IDs referred from image file names
     - `train-D`: {5, 6, 8, 9, 10, 13, 14, 15, 16, 17}
     - `train-R`: {3, 11, 12, 18}
 
@@ -86,7 +86,7 @@
     docker exec -it edge_gen_lab bash
     ```
 
-- Make directory `train-D_for_gen` in `/mnt/data/FishEye8K`
+- Make directory `train-D_for_gen` in `/mnt/data/FishEye8K/`
     - copy `images` folder from `train-D` to `train-D_for_gen`
     - for each image file (e.g. `camera5_A_0.png`) within `images`, make a corresponding text file (e.g. `camera5_A_0.txt`)
     - fill the text file with category names and caption of the image
