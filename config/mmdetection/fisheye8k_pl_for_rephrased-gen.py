@@ -73,7 +73,7 @@ model = dict(
 )
 
 # dataset
-data_root = '/mnt/nas-1/data/FishEyeChallenge/FishEye8K/'
+data_root = '/mnt/data/FishEye8K/'
 metainfo = {
     'classes': ('Bus', 'Bike', 'Car', 'Pedestrian', 'Truck'),
 }

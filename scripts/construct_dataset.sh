@@ -3,7 +3,7 @@
 CONFIG_FILE_NAME="fisheye8k_with_naive_v0"
 DET_MODEL_CKPT="ckpt/yolo/yolo11s_$CONFIG_FILE_NAME"
 
-DATA_DIR="/mnt/nas-1/data/FishEyeChallenge/FishEye8K"
+DATA_DIR="/mnt/data/FishEye8K"
 BASE_R_DIR="$DATA_DIR/train-R"
 PREF_DATA_DIR="$DATA_DIR/train-R_preference_with_naive_v0"
 REP_R_DATA_DIR="$DATA_DIR/train-R_rephrased-gen"

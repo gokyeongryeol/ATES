@@ -73,7 +73,7 @@ model = dict(
 )
 
 # dataset
-data_root = '/mnt/nas-1/data/FishEyeChallenge/FishEye8K/'
+data_root = '/mnt/data/FishEye8K/'
 metainfo = {
     'classes': ('Bus', 'Bike', 'Car', 'Pedestrian', 'Truck'),
 }
@@ -95,14 +95,14 @@ test_dataloader = dict(
     dataset=dict(
         data_root=data_root,
         metainfo=metainfo,
-        ann_file='train-D_naive_v1-gen/train-D_naive_v1-gen_with_dummy.json',
-        data_prefix=dict(img='train-D_naive_v1-gen/images/'),
+        ann_file='train-R/train-R.json',
+        data_prefix=dict(img='train-R/images/'),
         pipeline=test_pipeline,
     ),
 )
 
 # metric
-test_evaluator = dict(ann_file=data_root + 'train-D_naive_v1-gen/train-D_naive_v1-gen_with_dummy.json')
+test_evaluator = dict(ann_file=data_root + 'train-R/train-R.json')
 
 # save hook
 default_hooks = dict(

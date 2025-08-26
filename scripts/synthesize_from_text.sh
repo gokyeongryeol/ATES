@@ -3,7 +3,7 @@ set -e
 
 GEN_MODEL="black-forest-labs/FLUX.1-dev"
 # GEN_MODEL_CKPT="ckpt/flux/flux_fisheye8k/checkpoint-1000"  # TO BE UPDATED
-DATA_DIR="/mnt/nas-1/data/FishEyeChallenge/FishEye8K"
+DATA_DIR="/mnt/data/FishEye8K"
 
 BASE_D_DIR="$DATA_DIR/train-D"
 CAP_D_JSON="$BASE_D_DIR/train-D_with_caption.json"

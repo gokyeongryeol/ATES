@@ -2,7 +2,7 @@
     {
         "id": "fisheye",
         "type": "local",
-        "instance_data_dir": "/mnt/nas-1/data/FishEyeChallenge/FishEye8K/train-D_for_gen/images",
+        "instance_data_dir": "/mnt/data/FishEye8K/train-D_for_gen/images",
         "crop": false,
         "resolution": 1024,
         "resolution_type": "pixel_area",

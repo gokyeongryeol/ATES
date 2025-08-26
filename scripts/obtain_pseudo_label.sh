@@ -2,7 +2,7 @@
 set -e
 
 # CHECKPOINT="ckpt/codetr/codetr_fisheye8k/best_coco_bbox_mAP_epoch_9.pth"  # TO BE UPDATED
-DATA_DIR="/mnt/nas-1/data/FishEyeChallenge/FishEye8K"
+DATA_DIR="/mnt/data/FishEye8K"
 
 BASE_R_DIR="$DATA_DIR/train-R"
 OPT_CONF_JSON="$BASE_R_DIR/opt_conf_thr.json"

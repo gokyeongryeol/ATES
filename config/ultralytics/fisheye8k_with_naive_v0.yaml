@@ -6,7 +6,7 @@ names:
 - Truck
 nc: 5
 train:
-- /mnt/nas-1/data/FishEyeChallenge/FishEye8K/train-D/images
-- /mnt/nas-1/data/FishEyeChallenge/FishEye8K/train-D_naive_v0-gen/images
-val: /mnt/nas-1/data/FishEyeChallenge/FishEye8K/test/images
-val_json: /mnt/nas-1/data/FishEyeChallenge/FishEye8K/test/test.json
+- /mnt/data/FishEye8K/train-D/images
+- /mnt/data/FishEye8K/train-D_naive_v0-gen/images
+val: /mnt/data/FishEye8K/test/images
+val_json: /mnt/data/FishEye8K/test/test.json

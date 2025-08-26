@@ -3,7 +3,7 @@ set -e
 
 CAPTION_MODEL="OpenGVLab/InternVL3-38B"
 REPHRASE_MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
-DATA_DIR="/mnt/nas-1/data/FishEyeChallenge/FishEye8K"
+DATA_DIR="/mnt/data/FishEye8K"
 
 BASE_D_DIR="$DATA_DIR/train-D/"
 GT_D_JSON="$BASE_D_DIR/train-D.json"
