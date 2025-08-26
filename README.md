@@ -142,7 +142,7 @@
 
 
 ### 7. Evaluate the augmented train dataset
-- Compute mAP or mAP w/o TP
+- Compute mAP or mAP w/o TP of YOLO11-s
     ```bash
     bash scripts/eval_metrics.sh
     ```
