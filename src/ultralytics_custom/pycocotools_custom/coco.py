@@ -1,6 +1,6 @@
 # Copied from https://github.com/MoyoG/FishEye8K/blob/main/evaluation_Linux/pycocotools/coco.py
 
-__author__ = "tylin"
+__author__ = "XXXX"
 __version__ = "2.0"
 # Interface for accessing the Microsoft COCO dataset.
 

@@ -1,6 +1,6 @@
 # Copied from https://github.com/MoyoG/FishEye8K/blob/main/evaluation_Linux/pycocotools/cocoeval_modified.py
 
-__author__ = "tsungyi"
+__author__ = "XXXX"
 
 import numpy as np
 import datetime
