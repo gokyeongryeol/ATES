@@ -10,7 +10,7 @@
     - `train-R`: {3, 11, 12, 18}
 
 ### 2. Install
-- Download and setup with an editable mode
+- git clone to any directory within `/mnt/` and setup with an editable mode
     ```bash
     pip install -e .
     ```
@@ -49,7 +49,7 @@
 ## Experiment
 
 ### 1. Train a high-quality pseudo-labeler with edge_pseudo_lab
-- Switch to `edge_pseudo_lab`
+- Switch to `edge_pseudo_lab` and move to the cloned directory
     ```bash
     docker exec -it edge_pseudo_lab bash
     ```
@@ -81,7 +81,7 @@
     ```
 
 ### 3. Synthesize images from captions
-- Switch to `edge_gen_lab`
+- Switch to `edge_gen_lab` and move to the cloned directory
     ```bash
     docker exec -it edge_gen_lab bash
     ```
@@ -121,7 +121,7 @@
     ```
 
 ### 5. Apply preference learning to rephraser
-- Switch to `edge_rephrase_lab`
+- Switch to `edge_rephrase_lab` and move to the cloned directory
     ```bash
     docker exec -it edge_rephrase_lab bash
     ```
