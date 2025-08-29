@@ -10,6 +10,12 @@
     - `train-R`: {3, 11, 12, 18}
 
 ### 2. Install
+- Make base container
+    ```bash
+    cd docker
+    docker build -t img-base -f Dockerfile .
+    docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_base_lab img-base /bin/bash
+    ```
 - git clone to any directory within `/mnt/` and setup with an editable mode
     ```bash
     pip install -e .
@@ -25,35 +31,27 @@
     ```
 
 - Make separate containers
-    ```bash
-    cd docker
-    ```
-
     -  To be used to train Co-DETR
         ```bash
         docker build -t img-pseudo -f Dockerfile.mmdetection .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name edge_pseudo_lab img-pseudo /bin/bash
+        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_pseudo_lab img-pseudo /bin/bash
         ```
     - To be used to train Flux.1-dev
         ```bash
         docker build -t img-gen -f Dockerfile.simpletuner .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name edge_gen_lab img-gen /bin/bash
+        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_gen_lab img-gen /bin/bash
         ```
     - To be used to train LLAMA3
         ```bash
         docker build -t img-rephrase -f Dockerfile.trl .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name edge_rephrase_lab img-rephrase /bin/bash
+        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_rephrase_lab img-rephrase /bin/bash
         ```
 
 
 ## Experiment
 
-### 1. Train a high-quality pseudo-labeler with edge_pseudo_lab
-- Switch to `edge_pseudo_lab` and move to the cloned directory
-    ```bash
-    docker exec -it edge_pseudo_lab bash
-    ```
-
+### 1. Train a high-quality pseudo-labeler
+- Switch to `ates_pseudo_lab` and move to the cloned directory
 - Download the pretrained ckpt
     ```bash
     wget -P ckpt/codetr/ https://download.openmmlab.com/mmdetection/v3.0/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth
@@ -69,23 +67,18 @@
     bash scripts/mmdetection_train.sh
     ```
 
+- Estimate the temporary pseudo-labels (with low score threshold)
+    ```bash
+    bash scripts/obtain_tmp_pseudo_label.sh
+    ```
+
+- Switch to `ates_base_lab` and move to the cloned directory
 - Estimate the class-wise optimal score threshold
     ```bash
     bash scripts/estimate_optimal_threshold.sh
     ```
 
-### 2. Extract caption and its rephrased versions
-- Inference with InternVL3-38B and LLAMA3-8B-Instruct
-    ```bash
-    bash scripts/extract_and_rephrase.sh
-    ```
-
-### 3. Synthesize images from captions
-- Switch to `edge_gen_lab` and move to the cloned directory
-    ```bash
-    docker exec -it edge_gen_lab bash
-    ```
-
+### 2. Train a high-quality pseudo-labeler
 - Make `train-D_for_gen` folder in `/mnt/data/FishEye8K/`
     - copy `images` folder from `train-D` to `train-D_for_gen`
     - for each image file (e.g. `camera5_A_0.png`) within `images`, make a corresponding text file (e.g. `camera5_A_0.txt`)
@@ -94,38 +87,48 @@
         echo "bike, truck, car, A photo of an urban intersection with crosswalks and traffic lanes. Vehicles and bicycles are visible near a tall building. The fish-eye lens captures a wide view, including nearby greenery and infrastructure." > camera5_A_0.txt
         ```
 
+- Switch to `ates_gen_lab` and move to the cloned directory
 - Train Flux.1-dev
     ```bash
     ENV=simpletuner bash scripts/simpletuner_train.sh
     ```
 
+### 3. Extract caption and its rephrased versions
+- Switch to `ates_base_lab` and move to the cloned directory
+- Inference with InternVL3-38B and LLAMA3-8B-Instruct
+    ```bash
+    bash scripts/extract_and_rephrase.sh
+    ```
+
+### 4. Synthesize images from captions
+- Switch to `ates_gen_lab` and move to the cloned directory
 - Inference with the trained Flux.1-dev
     ```bash
     bash scripts/synthesize_from_text.sh
     ```
 
+- Switch to `ates_pseudo_lab` and move to the cloned directory
 - Inference with the trained Co-DETR
     ```bash
     bash scripts/obtain_pseudo_label.sh
     ```
 
-### 4. Construct a preference dataset
+### 5. Train a discriminative model
+- Switch to `ates_base_lab` and move to the cloned directory
 - Train YOLO11-s
     ```bash
     bash scripts/ultralytics_train.sh
     ```
 
+### 6. Construct a preference dataset
+- Switch to `ates_base_lab` and move to the cloned directory
 - Evaluate the edge-ness and assign binary labels of preference
     ```bash
     bash scripts/construct_dataset.sh
     ```
 
-### 5. Apply preference learning to rephraser
-- Switch to `edge_rephrase_lab` and move to the cloned directory
-    ```bash
-    docker exec -it edge_rephrase_lab bash
-    ```
-
+### 7. Apply preference learning to rephraser
+- Switch to `ates_rephrase_lab` and move to the cloned directory
 - Update data loading codes of `external/trl/trl/scripts/dpo.py` to
     ```python
     from datasets import load_from_disk
@@ -137,11 +140,12 @@
     bash scripts/trl_train.sh
     ```
 
-### 6. Augment the train dataset with the tuned rephraser
-- Go back to Step 2,3,4 uncommenting scripts for "automatic_v1" and commenting others
+### 8. Augment the train dataset with the tuned rephraser
+- Go back to Step 3,4,5 uncommenting scripts for "automatic_v1" and commenting others
 
 
-### 7. Evaluate the augmented train dataset
+### 9. Evaluate the augmented train dataset
+- Switch to `ates_base_lab` and move to the cloned directory
 - Compute mAP or mAP w/o TP of YOLO11-s
     ```bash
     bash scripts/eval_metrics.sh
