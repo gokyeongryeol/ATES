@@ -5,7 +5,7 @@ export WANDB_PROJECT="fisheye_gen_llama"
 DATA_DIR="/mnt/data/FishEye8K"
 PREF_DATA_DIR="$DATA_DIR/train-R_preference_with_naive_v0"
 
-accelerate launch --multi_gpu external/trl/trl/tools/dpo.py \
+accelerate launch --multi_gpu external/trl/trl/scripts/dpo.py \
     --dataset_name "$PREF_DATA_DIR" \
     --dataset_streaming \
     --model_name_or_path "meta-llama/Meta-Llama-3-8B-Instruct" \
