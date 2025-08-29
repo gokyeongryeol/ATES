@@ -56,9 +56,10 @@ RUN pip3 install "huggingface_hub[cli]"
 RUN pip3 install wandb
 
 # Clone SimpleTuner
-RUN git clone https://github.com/bghira/SimpleTuner --branch release
-# RUN git clone https://github.com/bghira/SimpleTuner --branch main # Uncomment to use latest (possibly unstable) version
+RUN git clone https://github.com/bghira/SimpleTuner /SimpleTuner \
+    && cd /SimpleTuner \
+    && git checkout fae268e464dc51a1f9ac32ccc4af5b44ad382ba8
 
 # Install SimpleTuner
 RUN pip3 install poetry
-RUN cd SimpleTuner && poetry install
+RUN poetry install

@@ -28,4 +28,5 @@ RUN pip install wandb
 RUN conda clean --all \
     && git clone https://github.com/open-mmlab/mmdetection.git /mmdetection \
     && cd /mmdetection \
+    && git checkout cfd5d3a985b0249de009b67d04f37263e11cdf3d \
     && pip install --no-cache-dir -e .
