@@ -2,7 +2,7 @@ FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
 
 # Install the required packages
 RUN apt-get update \
-    && apt-get install -y ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
+    && apt-get install -y wget vim ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

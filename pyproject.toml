@@ -13,4 +13,6 @@ dependencies = [
     "wandb>=0.20.1",
     "flash-attn==2.8.2",
     "datasets==3.5.0",
+    "peft==0.17.1",
+    "timm==1.0.19",
 ]
