@@ -12,4 +12,5 @@ dependencies = [
     "diffusers==0.34.0",
     "wandb>=0.20.1",
     "flash-attn==2.8.2",
+    "datasets==3.5.0",
 ]
