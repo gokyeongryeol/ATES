@@ -15,8 +15,8 @@ REP_R_PSEUDO_JSON="$REP_R_DATA_DIR/train-R_rephrased-gen_with_pseudolabel.json"
 REP_R_DATA_EVAL_DIR="$REP_R_DATA_DIR-eval"
 REP_R_PSEUDO_EVAL_JSON="$REP_R_DATA_EVAL_DIR/train-R_rephrased-gen-eval_with_pseudolabel.json"
 
-AUT_V1_D_DATA_DIR="$DATA_DIR/train-D_automatic_v1-gen"
-AUT_V1_D_PSEUDO_JSON="$AUT_V1_D_DATA_DIR/train-D_automatic_v1-gen_with_pseudolabel.json"
+# AUT_V1_D_DATA_DIR="$DATA_DIR/train-D_automatic_v1-gen"
+# AUT_V1_D_PSEUDO_JSON="$AUT_V1_D_DATA_DIR/train-D_automatic_v1-gen_with_pseudolabel.json"
 
 
 echo "[Pseudo-labeling images] Data: naive_v0-gen"
