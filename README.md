@@ -3,7 +3,7 @@
 ## Preparation
 
 ### 1. Dataset
-- Download [FishEye8K](https://scidm.nchc.org.tw/en/dataset/fisheye8k) dataset and place it into `/mnt/data/FishEye8K/`
+- Download [FishEye8K](https://github.com/MoyoG/FishEye8K?tab=readme-ov-file) dataset and place it into `/mnt/data/FishEye8K/`
 - Split `train` folder of `/mnt/data/FishEye8K/` into `train-D` and `train-R` based on camera IDs referred from image file names
     - `train-D`: {5, 6, 8, 9, 10, 13, 14, 15, 16, 17}
     - `train-R`: {3, 11, 12, 18}
