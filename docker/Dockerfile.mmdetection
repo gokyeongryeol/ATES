@@ -43,9 +43,13 @@ RUN pip install openmim && \
 # --------------------
 # Project
 # --------------------
+RUN conda clean --all \
+    && git clone https://github.com/open-mmlab/mmdetection.git /mmdetection \
+    && cd /mmdetection \
+    && git checkout cfd5d3a985b0249de009b67d04f37263e11cdf3d \
+    && pip install --no-cache-dir -e .
+
 COPY pyproject.toml README.md ./
 COPY src ./src
-COPY external/mmdetection ./external/mmdetection
 
-RUN pip install --no-cache-dir --no-build-isolation -e external/mmdetection
 RUN pip install -e ".[pseudo]"

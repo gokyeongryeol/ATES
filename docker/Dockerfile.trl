@@ -12,8 +12,6 @@ RUN pip install -U pip setuptools wheel ninja
 
 RUN pip install "huggingface_hub[cli]"
 
-RUN pip install wandb
-
 # Install trl
 RUN git clone https://github.com/huggingface/trl.git /trl \
     && cd /trl \
