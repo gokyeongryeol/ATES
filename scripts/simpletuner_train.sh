@@ -115,6 +115,6 @@ if [[ -z "${ACCELERATE_CONFIG_PATH}" ]]; then
     fi
 fi
 # Run the training script.
-accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}"   external/SimpleTuner/train.py
+accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}"   external/SimpleTuner/simpletuner/train.py
 
 exit 0

@@ -202,7 +202,7 @@ main() {
     require_file "${EXPERIMENT_CONFIG}"
     require_file "${COMPOSE_FILE}"
     require_file "${REPO_DIR}/tools/run_experiment.py"
-    require_file "${REPO_DIR}/external/SimpleTuner/train.py"
+    require_file "${REPO_DIR}/external/SimpleTuner/simpletuner/train.py"
     require_file "${REPO_DIR}/external/mmdetection/tools/dist_train.sh"
     require_file "${REPO_DIR}/external/trl/pyproject.toml"
 
@@ -211,7 +211,7 @@ main() {
     log "Verifying Python environments in compose services"
     verify_python_imports "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, peft, timm"
     verify_python_imports "${PSEUDO_SERVICE}" "import yaml, mmengine, mmdet, pycocotools, ultralytics, timm, matplotlib"
-    verify_python_imports "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris, datasets, deepspeed"
+    verify_python_imports "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris, datasets"
     verify_python_imports "${DPO_SERVICE}" "import yaml, accelerate, datasets, transformers, peft, trl"
 
     log "Updating experiment config with DATA_ROOT=${DATA_ROOT}"
