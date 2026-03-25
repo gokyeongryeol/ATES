@@ -1,4 +1,4 @@
-# Automatic Text-guided Edege-case Synthesis (ATES)
+# Automatic Text-guided Edge-case Synthesis (ATES)
 
 ## Setup
 
@@ -26,6 +26,7 @@ Build and start all services:
 docker compose build
 docker compose up -d
 docker compose exec base bash -lc "cd /workspace/ATES && pip install -e ."
+docker compose exec pseudo bash -lc "cd /workspace/ATES && pip install -e ."
 docker compose exec gen bash -lc "cd /workspace/ATES && pip install -e ."
 docker compose exec dpo bash -lc "cd /workspace/ATES && pip install -e ."
 ```
