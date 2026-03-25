@@ -9,7 +9,6 @@ import yaml
 
 @dataclass(frozen=True)
 class TrainingConfig:
-    project_name: str
     optimizer: str
     lr: float
     weight_decay: float
@@ -45,8 +44,6 @@ class ExperimentConfig:
     yolo_training: TrainingConfig
     yolo_distributed: DistributedConfig
     dpo_output_dir: Path
-    dpo_run_name: str
-    dpo_wandb_project: str
 
     @classmethod
     def from_file(cls, config_path: str | Path) -> "ExperimentConfig":
@@ -89,7 +86,6 @@ class ExperimentConfig:
             yolo_train_configs=list(yolo["train_configs"]),
             yolo_eval_configs=list(yolo["eval_configs"]),
             yolo_training=TrainingConfig(
-                project_name=yolo["project_name"],
                 optimizer=yolo["optimizer"],
                 lr=float(yolo["lr"]),
                 weight_decay=float(yolo["weight_decay"]),
@@ -102,8 +98,6 @@ class ExperimentConfig:
                 master_port=int(yolo["distributed"]["master_port"]),
             ),
             dpo_output_dir=cls._resolve_path(root_dir, dpo["output_dir"]),
-            dpo_run_name=dpo["run_name"],
-            dpo_wandb_project=dpo["wandb_project"],
         )
 
     @staticmethod

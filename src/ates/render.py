@@ -106,14 +106,6 @@ def maybe_relpath(path: Path, root_dir: Path) -> str:
 def render_mmdet_training_config(*, data_root: Path, pretrained_checkpoint: str) -> str:
     return f"""_base_ = ['{MMDET_BASE}']
 
-_base_.visualizer.vis_backends = [
-    dict(type='LocalVisBackend'),
-    dict(
-        type='WandbVisBackend',
-        init_kwargs=dict(project='fisheye_od_codetr', name='codetr_fisheye8k'),
-    ),
-]
-
 load_from = {pretrained_checkpoint!r}
 
 num_dec_layer = 6

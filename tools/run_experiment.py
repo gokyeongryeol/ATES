@@ -278,7 +278,6 @@ def stage_construct_preference(experiment: ExperimentConfig, _: argparse.Namespa
 
 def stage_train_dpo(experiment: ExperimentConfig, _: argparse.Namespace) -> None:
     env = os.environ.copy()
-    env["WANDB_PROJECT"] = experiment.dpo_wandb_project
     run_command(
         [
             "accelerate",
@@ -314,8 +313,6 @@ def stage_train_dpo(experiment: ExperimentConfig, _: argparse.Namespace) -> None
             "32",
             "--lora_alpha",
             "16",
-            "--report_to",
-            "wandb",
         ],
         env=env,
     )
