@@ -209,6 +209,7 @@ main() {
 
     log "Bootstrapping Python environments in compose services"
     ensure_python_package_set "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, datasets, peft, timm" "pip install -e ."
+    ensure_python_package_set "${PSEUDO_SERVICE}" "import yaml, mmengine, mmdet, pycocotools, ultralytics, timm, matplotlib" "pip install -e ."
     ensure_python_package_set "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris" "pip install -e ."
     ensure_python_package_set "${DPO_SERVICE}" "import yaml, accelerate, datasets, transformers, peft, trl" "pip install -e ."
 
@@ -232,8 +233,8 @@ main() {
     log "Stage 1b: Temporary pseudo labels in ${PSEUDO_SERVICE}"
     docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-tmp-pseudo"
 
-    log "Stage 1c: Estimate optimal thresholds in ${BASE_SERVICE}"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' estimate-threshold"
+    log "Stage 1c: Estimate optimal thresholds in ${PSEUDO_SERVICE}"
+    docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' estimate-threshold"
 
     log "Stage 2: Train Flux / SimpleTuner in ${GEN_SERVICE}"
     docker_exec_repo "${GEN_SERVICE}" "${SIMPLETUNER_COMMAND}"
@@ -258,7 +259,7 @@ main() {
     log "Stage 6: Construct preference dataset in ${BASE_SERVICE}"
     docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' construct-preference"
 
-    log "Stage 7: Train DPO rephraser in ${REPHRASE_SERVICE}"
+    log "Stage 7: Train DPO rephraser in ${DPO_SERVICE}"
     docker_exec_repo "${DPO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-dpo"
 
     log "Updating config with latest automatic rephraser checkpoint"
