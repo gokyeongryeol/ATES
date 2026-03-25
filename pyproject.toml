@@ -19,34 +19,20 @@ base = [
     "ultralytics==8.3.155",
     "transformers==4.50.3",
     "accelerate==1.5.2",
-    "wandb>=0.20.1",
     "peft==0.17.1",
     "timm==1.0.19",
-    "matplotlib>=3.8.0",
 ]
 pseudo = [
     "Pillow>=11.0.0",
     "pycocotools>=2.0.10",
     "ultralytics==8.3.155",
     "timm==1.0.19",
-    "matplotlib>=3.8.0",
-]
-gen = [
-    "Pillow>=11.0.0",
-    "accelerate==1.5.2",
-    "diffusers==0.34.0",
-    "transformers==4.50.3",
-    "lycoris-lora>=3.3.0",
 ]
 dpo = [
+    "transformers==4.50.3",
     "accelerate==1.5.2",
     "datasets==3.5.0",
-    "transformers==4.50.3",
-    "wandb>=0.20.1",
     "peft==0.17.1",
-]
-all = [
-    "ates[base,pseudo,gen,dpo]",
 ]
 
 [tool.setuptools]

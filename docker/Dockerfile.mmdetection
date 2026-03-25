@@ -1,39 +1,51 @@
-FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
+ARG PYTORCH="2.1.2"
+ARG CUDA="12.1"
+ARG CUDNN="8"
+
+FROM pytorch/pytorch:${PYTORCH}-cuda${CUDA}-cudnn${CUDNN}-devel
 
 WORKDIR /workspace/ATES
 
-# Install the required packages
-RUN apt-get update \
-    && apt-get install -y wget vim ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+ENV TORCH_CUDA_ARCH_LIST="8.0 8.6 9.0" \
+    TORCH_NVCC_FLAGS="-Xfatbin -compress-all" \
+    CMAKE_PREFIX_PATH="$(dirname $(which conda))/../" \
+    FORCE_CUDA="1"
 
-RUN pip install -U pip setuptools wheel ninja
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Seoul
 
-# Install MMEngine
+# --------------------
+# System packages
+# --------------------
+RUN apt-get update && \
+    apt-get install -y \
+        wget \
+        ffmpeg \
+        libsm6 \
+        libxext6 \
+        git \
+        ninja-build \
+        libglib2.0-0 \
+        libxrender-dev \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
+
+# --------------------
+# Python packages
+# --------------------
+RUN pip install "pip<23.1"
+
+# MMEngine / MMCV
 RUN pip install openmim && \
-    mim install "mmengine>=0.7.1"
+    mim install "mmengine>=0.8.0" && \
+    pip install mmcv==2.1.0 -f https://download.openmmlab.com/mmcv/dist/cu121/torch2.1/index.html
 
-ENV MMCV_WITH_OPS=1
-ENV FORCE_CUDA=1
-ENV TORCH_CUDA_ARCH_LIST="6.0;6.1;7.0;7.2;7.5;8.0;8.6;8.9;9.0a"
-
-# Install MMCV
-RUN git clone https://github.com/open-mmlab/mmcv.git /mmcv \
-    && cd /mmcv \
-    && pip install -r requirements/optional.txt \
-    && pip install -e . -v
-
-RUN pip install wandb
-
-# Install MMDetection
-RUN conda clean --all \
-    && git clone https://github.com/open-mmlab/mmdetection.git /mmdetection \
-    && cd /mmdetection \
-    && git checkout cfd5d3a985b0249de009b67d04f37263e11cdf3d \
-    && pip install --no-cache-dir -e .
-
+# --------------------
+# Project
+# --------------------
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY external/mmdetection ./external/mmdetection
 
+RUN pip install --no-cache-dir --no-build-isolation -e external/mmdetection
 RUN pip install -e ".[pseudo]"

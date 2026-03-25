@@ -47,7 +47,7 @@ verify_python_imports() {
         return 0
     fi
 
-    docker compose -f "${COMPOSE_FILE}" -p "${COMPOSE_PROJECT_NAME}" exec -T "${service}" bash -lc "cd '${CONTAINER_REPO_DIR}' && python -c \"${import_check}\"" >/dev/null 2>&1 || {
+    docker compose -f "${COMPOSE_FILE}" -p "${COMPOSE_PROJECT_NAME}" exec -T "${service}" bash -lc "cd '${CONTAINER_REPO_DIR}' && python3 -c \"${import_check}\"" >/dev/null 2>&1 || {
         echo "Missing Python dependencies in service ${service}. Rebuild the image with 'docker compose build ${service}'." >&2
         exit 1
     }
@@ -218,13 +218,13 @@ main() {
     update_config_value "paths.data_root" "${DATA_ROOT}"
 
     log "Rendering derived configs"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' render-configs"
+    docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' render-configs"
 
     log "Ensuring Co-DETR pretrained checkpoint is present"
     docker_exec_repo "${PSEUDO_SERVICE}" "mkdir -p ckpt/codetr && test -f ckpt/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth || wget -P ckpt/codetr/ https://download.openmmlab.com/mmdetection/v3.0/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth"
 
     log "Stage 1: Train Co-DETR pseudo-labeler in ${PSEUDO_SERVICE}"
-    docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' mmdet-train"
+    docker_exec_repo "${PSEUDO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' mmdet-train"
 
     log "Updating config with best Co-DETR checkpoint"
     local codetr_ckpt
@@ -232,10 +232,10 @@ main() {
     update_config_value "checkpoints.codetr_finetuned" "${codetr_ckpt}"
 
     log "Stage 1b: Temporary pseudo labels in ${PSEUDO_SERVICE}"
-    docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-tmp-pseudo"
+    docker_exec_repo "${PSEUDO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-tmp-pseudo"
 
     log "Stage 1c: Estimate optimal thresholds in ${PSEUDO_SERVICE}"
-    docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' estimate-threshold"
+    docker_exec_repo "${PSEUDO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' estimate-threshold"
 
     log "Stage 2: Train Flux / SimpleTuner in ${GEN_SERVICE}"
     docker_exec_repo "${GEN_SERVICE}" "${SIMPLETUNER_COMMAND}"
@@ -246,22 +246,22 @@ main() {
     update_config_value "checkpoints.flux_adapter" "${flux_ckpt}"
 
     log "Stage 3: Extract captions and diverse rephrases in ${BASE_SERVICE}"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' extract-and-rephrase"
+    docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' extract-and-rephrase"
 
     log "Stage 4: Synthesize images in ${GEN_SERVICE}"
-    docker_exec_repo "${GEN_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' synthesize"
+    docker_exec_repo "${GEN_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' synthesize"
 
     log "Stage 4b: Pseudo-label synthesized images in ${PSEUDO_SERVICE}"
-    docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-pseudo"
+    docker_exec_repo "${PSEUDO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-pseudo"
 
     log "Stage 5: Train YOLO baseline and naive_v0 models in ${BASE_SERVICE}"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-yolo"
+    docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-yolo"
 
     log "Stage 6: Construct preference dataset in ${BASE_SERVICE}"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' construct-preference"
+    docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' construct-preference"
 
     log "Stage 7: Train DPO rephraser in ${DPO_SERVICE}"
-    docker_exec_repo "${DPO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-llama"
+    docker_exec_repo "${DPO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-llama"
 
     log "Updating config with latest automatic rephraser checkpoint"
     local automatic_ckpt
@@ -270,20 +270,20 @@ main() {
 
     if [[ "${RUN_AUTOMATIC_V1}" == "1" ]]; then
         log "Stage 8: Generate automatic_v1 captions in ${BASE_SERVICE}"
-        docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' extract-and-rephrase --include-automatic-v1"
+        docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' extract-and-rephrase --include-automatic-v1"
 
         log "Stage 8b: Synthesize automatic_v1 images in ${GEN_SERVICE}"
-        docker_exec_repo "${GEN_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' synthesize --include-automatic-v1"
+        docker_exec_repo "${GEN_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' synthesize --include-automatic-v1"
 
         log "Stage 8c: Pseudo-label automatic_v1 images in ${PSEUDO_SERVICE}"
-        docker_exec_repo "${PSEUDO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-pseudo --include-automatic-v1"
+        docker_exec_repo "${PSEUDO_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' obtain-pseudo --include-automatic-v1"
 
         log "Stage 8d: Train YOLO automatic_v1 model in ${BASE_SERVICE}"
-        docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-yolo --config fisheye8k_with_naive_v0+automatic_v1"
+        docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-yolo --config fisheye8k_with_naive_v0+automatic_v1"
     fi
 
     log "Stage 9: Evaluate all configured YOLO runs in ${BASE_SERVICE}"
-    docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' eval"
+    docker_exec_repo "${BASE_SERVICE}" "python3 tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' eval"
 
     log "Completed full ATES experiment pipeline"
     log "Final config: ${EXPERIMENT_CONFIG}"

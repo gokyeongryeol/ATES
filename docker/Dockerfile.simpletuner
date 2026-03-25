@@ -1,14 +1,15 @@
 # SimpleTuner needs CU141
 FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
 
-WORKDIR /workspace/ATES
+# /workspace is the default volume for Runpod & other hosts
+WORKDIR /workspace
 
 # Update apt-get
 RUN apt-get update -y
 
 # Prevents different commands from being stuck by waiting
 # on user input during build
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install libg dependencies
 RUN apt install libgl1-mesa-glx -y
@@ -54,12 +55,17 @@ RUN pip3 install "huggingface_hub[cli]"
 # WanDB
 RUN pip3 install wandb
 
+# Clone SimpleTuner
+RUN git clone https://github.com/bghira/SimpleTuner --branch release \
+    && cd SimpleTuner \
+    && git checkout fae268e464dc51a1f9ac32ccc4af5b44ad382ba8 \
+    && cd ..
+
+# Install SimpleTuner
 RUN pip3 install poetry
-RUN poetry config virtualenvs.create false
+RUN cd SimpleTuner && poetry install
 
 COPY pyproject.toml README.md ./
 COPY src ./src
-COPY external/SimpleTuner ./external/SimpleTuner
 
-RUN pip3 install -e ".[gen]"
-RUN cd external/SimpleTuner && poetry install
+RUN pip install -e ".[gen]"

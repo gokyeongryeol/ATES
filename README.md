@@ -33,14 +33,6 @@ docker compose build
 docker compose up -d
 ```
 
-Project dependencies are baked into each image at build time.
-
-For a local editable install, use:
-
-```bash
-bash scripts/install_editable.sh base
-```
-
 Services:
 
 - `base`: Captioning by InternVL3, Rephrasing by Llama3, YOLOv11 training and evaluation
