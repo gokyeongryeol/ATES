@@ -55,6 +55,7 @@ RUN pip3 install "huggingface_hub[cli]"
 RUN pip3 install wandb
 
 RUN pip3 install poetry
+RUN poetry config virtualenvs.create false
 
 COPY pyproject.toml README.md ./
 COPY src ./src

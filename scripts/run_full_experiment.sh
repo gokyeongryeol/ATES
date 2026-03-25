@@ -202,6 +202,9 @@ main() {
     require_file "${EXPERIMENT_CONFIG}"
     require_file "${COMPOSE_FILE}"
     require_file "${REPO_DIR}/tools/run_experiment.py"
+    require_file "${REPO_DIR}/external/SimpleTuner/train.py"
+    require_file "${REPO_DIR}/external/mmdetection/tools/dist_train.sh"
+    require_file "${REPO_DIR}/external/trl/pyproject.toml"
 
     maybe_build_and_start_containers
 

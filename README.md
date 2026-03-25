@@ -10,6 +10,12 @@ train-R/{images,train-R.json}
 test/{images,test.json}
 ```
 
+Initialize submodules before building:
+
+```bash
+git submodule update --init --recursive
+```
+
 Edit `config/ates/default.yaml` for:
 
 - `paths.data_root`
