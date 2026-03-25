@@ -208,7 +208,7 @@ main() {
     log "Verifying Python environments in compose services"
     verify_python_imports "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, peft, timm"
     verify_python_imports "${PSEUDO_SERVICE}" "import yaml, mmengine, mmdet, pycocotools, ultralytics, timm, matplotlib"
-    verify_python_imports "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris"
+    verify_python_imports "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris, datasets, deepspeed"
     verify_python_imports "${DPO_SERVICE}" "import yaml, accelerate, datasets, transformers, peft, trl"
 
     log "Updating experiment config with DATA_ROOT=${DATA_ROOT}"

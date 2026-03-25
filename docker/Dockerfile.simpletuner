@@ -54,7 +54,11 @@ RUN pip3 install "huggingface_hub[cli]"
 # WanDB
 RUN pip3 install wandb
 
+RUN pip3 install poetry
+
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY external/SimpleTuner ./external/SimpleTuner
 
 RUN pip3 install -e ".[gen]"
+RUN cd external/SimpleTuner && poetry install
