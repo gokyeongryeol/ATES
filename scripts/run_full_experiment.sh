@@ -261,7 +261,7 @@ main() {
     docker_exec_repo "${BASE_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' construct-preference"
 
     log "Stage 7: Train DPO rephraser in ${DPO_SERVICE}"
-    docker_exec_repo "${DPO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-dpo"
+    docker_exec_repo "${DPO_SERVICE}" "python tools/run_experiment.py --experiment-config '${CONTAINER_EXPERIMENT_CONFIG}' train-llama"
 
     log "Updating config with latest automatic rephraser checkpoint"
     local automatic_ckpt

@@ -83,17 +83,17 @@ docker compose exec gen bash -lc "cd /workspace/ATES && python tools/run_experim
 docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py obtain-pseudo"
 ```
 
-5. Train YOLO
+5. Train YOLOv11 and build preference data
 
 ```bash
 docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-yolo"
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py construct-preference"
 ```
 
-6. Build preference data and train DPO
+6. Train Llama3
 
 ```bash
-docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py construct-preference"
-docker compose exec dpo bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-dpo"
+docker compose exec dpo bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-llama"
 python tools/update_experiment_config.py --key checkpoints.automatic_rephraser --glob "ckpt/llama/llama_dpo_fisheye8k_with_naive_v0/checkpoint-*" --expect dir
 ```
 
@@ -106,7 +106,7 @@ docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_expe
 docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-yolo --config fisheye8k_with_naive_v0+automatic_v1"
 ```
 
-8. Evaluate
+8. Evaluate YOLOv11
 
 ```bash
 docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py eval"
