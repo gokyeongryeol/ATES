@@ -10,7 +10,7 @@ train-R/{images,train-R.json}
 test/{images,test.json}
 ```
 
-Edit [`config/ates/default.yaml`](/data/krgo/ATES/config/ates/default.yaml) for:
+Edit `config/ates/default.yaml` for:
 
 - `paths.data_root`
 - `checkpoints.codetr_finetuned`
