@@ -1,0 +1,68 @@
+services:
+  base:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: ates-base
+    working_dir: /workspace/ATES
+    volumes:
+      - .:/workspace/ATES
+      - /mnt:/mnt
+      - /data:/data
+    stdin_open: true
+    tty: true
+    gpus: all
+    shm_size: 8g
+    restart: unless-stopped
+    command: sleep infinity
+
+  pseudo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mmdetection
+    image: ates-pseudo
+    working_dir: /workspace/ATES
+    volumes:
+      - .:/workspace/ATES
+      - /mnt:/mnt
+      - /data:/data
+    stdin_open: true
+    tty: true
+    gpus: all
+    shm_size: 8g
+    restart: unless-stopped
+    command: sleep infinity
+
+  gen:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.simpletuner
+    image: ates-gen
+    working_dir: /workspace/ATES
+    volumes:
+      - .:/workspace/ATES
+      - /mnt:/mnt
+      - /data:/data
+    stdin_open: true
+    tty: true
+    gpus: all
+    shm_size: 8g
+    restart: unless-stopped
+    command: sleep infinity
+
+  dpo:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.trl
+    image: ates-dpo
+    working_dir: /workspace/ATES
+    volumes:
+      - .:/workspace/ATES
+      - /mnt:/mnt
+      - /data:/data
+    stdin_open: true
+    tty: true
+    gpus: all
+    shm_size: 8g
+    restart: unless-stopped
+    command: sleep infinity

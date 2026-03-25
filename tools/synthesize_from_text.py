@@ -1,6 +1,13 @@
 import argparse
 import os
-import json
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 import torch
 from accelerate import Accelerator
 from accelerate.utils import gather_object
@@ -10,16 +17,7 @@ from tqdm import tqdm
 from diffusers import FluxPipeline, FluxTransformer2DModel
 from lycoris import create_lycoris_from_weights
 
-
-def remove_duplicate_image_dicts(image_dicts):
-    seen_ids = set()
-    unique_dicts = []
-    for d in image_dicts:
-        img_id = d["id"]
-        if img_id not in seen_ids:
-            seen_ids.add(img_id)
-            unique_dicts.append(d)
-    return unique_dicts
+from ates.io import dedupe_image_dicts, load_json, write_json
 
 
 class PromptDataset(TorchDataset):
@@ -52,7 +50,7 @@ class ImageSynthesizer:
             torch_dtype=torch.bfloat16,
         )
         if ckpt_dir:
-            lycoris_config = json.load(open(os.path.join(ckpt_dir, "lycoris_config.json")))
+            lycoris_config = load_json(os.path.join(ckpt_dir, "lycoris_config.json"))
             multiplier = int(lycoris_config.pop("multiplier"))
             lycoris_wrapped_network = create_lycoris_from_weights(
                 multiplier,
@@ -70,7 +68,7 @@ class ImageSynthesizer:
         ).to(self.device)
         self.pipe.set_progress_bar_config(disable=True)
 
-        self.data = json.load(open(json_path, 'r'))
+        self.data = load_json(json_path)
         self.image_dicts = self.data['images']
         self.dataset = PromptDataset(self.image_dicts, use_naive=use_naive)
 
@@ -124,12 +122,11 @@ class ImageSynthesizer:
         all_outputs = gather_object(output_list)
 
         if self.accelerator.is_main_process:
-            self.data['images'] = remove_duplicate_image_dicts(list(all_outputs))
+            self.data['images'] = dedupe_image_dicts(list(all_outputs))
             self.data['annotations'] = []
             output_file = os.path.basename(self.output_dir) + "_with_dummy.json"
             output_path = os.path.join(self.output_dir, output_file)
-            with open(output_path, 'w') as f:
-                json.dump(self.data, f)
+            write_json(output_path, self.data)
 
 
 if __name__ == "__main__":

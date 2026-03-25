@@ -1,6 +1,6 @@
 from typing import Optional
 import argparse
-import json
+import sys
 import os
 import yaml
 import matplotlib.pyplot as plt
@@ -9,9 +9,16 @@ import numpy as np
 from ultralytics import YOLO
 from ultralytics.models.yolo.detect.val import DetectionValidator
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 from ultralytics_custom.models.yolo.detect.val import CustomDetectionValidator
 from ultralytics_custom.pycocotools_custom.coco import COCO
 from ultralytics_custom.pycocotools_custom.cocoeval_modified import COCOeval
+
+from ates.io import write_json
 
 
 def main(
@@ -98,13 +105,12 @@ def main(
 
     # save
     if save_json is not None:
-        with open(save_json, "w") as f:
-            data = {
-                **opt_conf_thresh_dict,
-                "f1": f1,
-                "f1@0.5": f1_50,
-            }
-            json.dump(data, f, indent=4)
+        data = {
+            **opt_conf_thresh_dict,
+            "f1": f1,
+            "f1@0.5": f1_50,
+        }
+        write_json(save_json, data, indent=4)
 
 
 if __name__ == "__main__":
