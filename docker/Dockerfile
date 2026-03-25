@@ -1,5 +1,7 @@
 FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
 
+WORKDIR /workspace/ATES
+
 # Install the required packages
 RUN apt-get update \
     && apt-get install -y vim ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
@@ -11,3 +13,8 @@ RUN pip install -U pip setuptools wheel ninja
 RUN pip install "huggingface_hub[cli]"
 
 RUN pip install wandb
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN pip install -e ".[base]"

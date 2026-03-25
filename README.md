@@ -25,11 +25,9 @@ Build and start all services:
 ```bash
 docker compose build
 docker compose up -d
-docker compose exec base bash -lc "cd /workspace/ATES && pip install -e ."
-docker compose exec pseudo bash -lc "cd /workspace/ATES && pip install -e ."
-docker compose exec gen bash -lc "cd /workspace/ATES && pip install -e ."
-docker compose exec dpo bash -lc "cd /workspace/ATES && pip install -e ."
 ```
+
+Project dependencies are baked into each image at build time.
 
 Services:
 

@@ -38,21 +38,19 @@ require_cmd() {
 }
 
 
-ensure_python_package_set() {
+verify_python_imports() {
     local service="$1"
     local import_check="$2"
-    local install_command="$3"
 
     if [[ "${DRY_RUN}" == "1" ]]; then
         log "Would verify Python deps in service ${service}: ${import_check}"
         return 0
     fi
 
-    if docker compose -f "${COMPOSE_FILE}" -p "${COMPOSE_PROJECT_NAME}" exec -T "${service}" bash -lc "cd '${CONTAINER_REPO_DIR}' && python -c \"${import_check}\"" >/dev/null 2>&1; then
-        return 0
-    fi
-
-    docker_exec_repo "${service}" "${install_command}"
+    docker compose -f "${COMPOSE_FILE}" -p "${COMPOSE_PROJECT_NAME}" exec -T "${service}" bash -lc "cd '${CONTAINER_REPO_DIR}' && python -c \"${import_check}\"" >/dev/null 2>&1 || {
+        echo "Missing Python dependencies in service ${service}. Rebuild the image with 'docker compose build ${service}'." >&2
+        exit 1
+    }
 }
 
 
@@ -207,11 +205,11 @@ main() {
 
     maybe_build_and_start_containers
 
-    log "Bootstrapping Python environments in compose services"
-    ensure_python_package_set "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, datasets, peft, timm" "pip install -e ."
-    ensure_python_package_set "${PSEUDO_SERVICE}" "import yaml, mmengine, mmdet, pycocotools, ultralytics, timm, matplotlib" "pip install -e ."
-    ensure_python_package_set "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris" "pip install -e ."
-    ensure_python_package_set "${DPO_SERVICE}" "import yaml, accelerate, datasets, transformers, peft, trl" "pip install -e ."
+    log "Verifying Python environments in compose services"
+    verify_python_imports "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, peft, timm"
+    verify_python_imports "${PSEUDO_SERVICE}" "import yaml, mmengine, mmdet, pycocotools, ultralytics, timm, matplotlib"
+    verify_python_imports "${GEN_SERVICE}" "import yaml, accelerate, diffusers, transformers, lycoris"
+    verify_python_imports "${DPO_SERVICE}" "import yaml, accelerate, datasets, transformers, peft, trl"
 
     log "Updating experiment config with DATA_ROOT=${DATA_ROOT}"
     update_config_value "paths.data_root" "${DATA_ROOT}"

@@ -15,12 +15,14 @@ if [ -z "${VENV_PATH}" ]; then
     fi
 fi
 
-# If a venv hasn't already been activated, activate it now
-if [[ -z "${VIRTUAL_ENV}" ]]; then
+# If a venv hasn't already been activated, activate it now when present.
+# Compose images install the required Python packages at build time and may not
+# provide a project-local venv.
+if [[ -z "${VIRTUAL_ENV}" && -n "${VENV_PATH}" && -f "${VENV_PATH}/bin/activate" ]]; then
     source "${VENV_PATH}/bin/activate"
 fi
 
-if [ -z "${DISABLE_LD_OVERRIDE}" ]; then
+if [ -z "${DISABLE_LD_OVERRIDE}" ] && [ -n "${VENV_PATH}" ] && [ -d "${VENV_PATH}" ]; then
     export NVJITLINK_PATH="$(find "${VENV_PATH}" -name nvjitlink -type d)/lib"
     # if it's not empty, we will add it to LD_LIBRARY_PATH at the front:
     if [ -n "${NVJITLINK_PATH}" ]; then

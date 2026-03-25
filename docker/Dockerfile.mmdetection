@@ -1,5 +1,7 @@
 FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-devel
 
+WORKDIR /workspace/ATES
+
 # Install the required packages
 RUN apt-get update \
     && apt-get install -y wget vim ffmpeg libsm6 libxext6 git ninja-build libglib2.0-0 libsm6 libxrender-dev libxext6 build-essential gcc g++ \
@@ -30,3 +32,8 @@ RUN conda clean --all \
     && cd /mmdetection \
     && git checkout cfd5d3a985b0249de009b67d04f37263e11cdf3d \
     && pip install --no-cache-dir -e .
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN pip install -e ".[pseudo]"
