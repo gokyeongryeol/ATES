@@ -16,5 +16,6 @@ RUN pip install wandb
 
 COPY pyproject.toml README.md ./
 COPY src ./src
+COPY scripts/install_editable.sh ./scripts/install_editable.sh
 
-RUN pip install -e ".[base]"
+RUN bash scripts/install_editable.sh base
