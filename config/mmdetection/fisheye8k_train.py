@@ -1,13 +1,5 @@
 _base_ = ['../../external/mmdetection/projects/CO-DETR/configs/codino/co_dino_5scale_swin_l_16xb1_16e_o365tococo.py']
 
-_base_.visualizer.vis_backends = [
-    dict(type='LocalVisBackend'),
-    dict(
-        type='WandbVisBackend',
-        init_kwargs=dict(project='fisheye_od_codetr', name='codetr_fisheye8k'),
-    ),
-]
-
 load_from = 'ckpt/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth'
 
 num_dec_layer = 6

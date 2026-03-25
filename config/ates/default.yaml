@@ -1,12 +1,10 @@
 paths:
   data_root: /mnt/data/FishEye8K
   work_root: work_dirs
-
 models:
   caption_model: OpenGVLab/InternVL3-38B
   rephrase_model: meta-llama/Meta-Llama-3-8B-Instruct
   generator_model: black-forest-labs/FLUX.1-dev
-
 checkpoints:
   codetr_pretrained: ckpt/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth
   codetr_work_dir: ckpt/codetr/codetr_fisheye8k
@@ -14,33 +12,27 @@ checkpoints:
   flux_adapter: null
   automatic_rephraser: null
   yolo_init_weights: ckpt/yolo/yolo11s.pt
-
 codetr:
   distributed:
     nproc_per_node: 4
     devices: 0,1,2,3
     master_port: 29500
-
 yolo:
-  project_name: fisheye_od_yolo
   optimizer: sgd
   lr: 0.001
   weight_decay: 0.0005
   image_size: 1280
   seed: 2035
   train_configs:
-    - fisheye8k
-    - fisheye8k_with_naive_v0
+  - fisheye8k
+  - fisheye8k_with_naive_v0
   eval_configs:
-    - fisheye8k
-    - fisheye8k_with_naive_v0
-    - fisheye8k_with_naive_v0+automatic_v1
+  - fisheye8k
+  - fisheye8k_with_naive_v0
+  - fisheye8k_with_naive_v0+automatic_v1
   distributed:
     nproc_per_node: 4
     devices: 0,1,2,3
     master_port: 29500
-
 dpo:
   output_dir: ckpt/llama/llama_dpo_fisheye8k_with_naive_v0
-  run_name: llama_dpo_fisheye8k_with_naive_v0
-  wandb_project: fisheye_gen_llama
