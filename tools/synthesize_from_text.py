@@ -1,7 +1,9 @@
 import argparse
 import os
 import sys
+import tempfile
 from pathlib import Path
+from PIL import Image
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT_DIR / "src"
@@ -18,6 +20,43 @@ from diffusers import FluxPipeline, FluxTransformer2DModel
 from lycoris import create_lycoris_from_weights
 
 from ates.io import dedupe_image_dicts, load_json, write_json
+
+
+def verify_image(path):
+    try:
+        with Image.open(path) as img:
+            img.load()
+        return True
+    except Exception:
+        return False
+
+
+def safe_save(image, save_path):
+    dir_name = os.path.dirname(save_path)
+
+    with tempfile.NamedTemporaryFile(delete=False, dir=dir_name, suffix=".png") as tmp:
+        tmp_path = tmp.name
+
+    try:
+        image.save(tmp_path)
+
+        with open(tmp_path, "rb") as f:
+            os.fsync(f.fileno())
+
+        os.replace(tmp_path, save_path)
+
+        if not verify_image(save_path):
+            print(f"[WARN] corrupted image detected: {save_path}")
+            os.remove(save_path)
+            return False
+
+        return True
+
+    except Exception as e:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+        print(f"[ERROR] save failed: {save_path} | {e}")
+        return False
 
 
 class PromptDataset(TorchDataset):
@@ -107,7 +146,9 @@ class ImageSynthesizer:
 
                 for i, image in enumerate(images):
                     save_path = os.path.join(self.output_dir, "images", f"{file_name}-{i}.{ext}")
-                    image.save(save_path)
+                    ok = safe_save(image, save_path)
+                    if not ok:
+                        continue
 
                     width, height = image.size
                     img_dict = {
