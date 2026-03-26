@@ -222,8 +222,6 @@ def stage_train_yolo(experiment: ExperimentConfig, args: argparse.Namespace) -> 
                 f"--nproc_per_node={distributed.nproc_per_node}",
                 f"--master_port={distributed.master_port}",
                 "tools/train_base_detector.py",
-                "--project-name",
-                experiment.yolo_training.project_name,
                 "--run-name",
                 f"yolo11s_{config_name}",
                 "--yaml-file",
@@ -244,6 +242,12 @@ def stage_train_yolo(experiment: ExperimentConfig, args: argparse.Namespace) -> 
                 str(experiment.yolo_training.seed),
             ]
         )
+
+        run_command([
+            "mv",
+            f"runs/detect/yolo11s_{config_name}",
+            f"ckpt/yolo/yolo11s_{config_name}",
+        ])
 
 
 def stage_construct_preference(experiment: ExperimentConfig, _: argparse.Namespace) -> None:
@@ -305,8 +309,6 @@ def stage_train_dpo(experiment: ExperimentConfig, _: argparse.Namespace) -> None
             "100",
             "--output_dir",
             str(experiment.dpo_output_dir),
-            "--run_name",
-            experiment.dpo_run_name,
             "--no_remove_unused_columns",
             "--use_peft",
             "--lora_r",
@@ -375,7 +377,7 @@ def build_parser() -> argparse.ArgumentParser:
     train_yolo.add_argument("--config", dest="stage_config", default=None)
 
     subparsers.add_parser("construct-preference")
-    subparsers.add_parser("train-dpo")
+    subparsers.add_parser("train-llama")
 
     evaluate = subparsers.add_parser("eval")
     evaluate.add_argument("--config", dest="stage_config", default=None)
@@ -399,7 +401,7 @@ def main() -> None:
         "obtain-pseudo": stage_obtain_pseudo,
         "train-yolo": stage_train_yolo,
         "construct-preference": stage_construct_preference,
-        "train-dpo": stage_train_dpo,
+        "train-llama": stage_train_dpo,
         "eval": stage_eval,
         "print-config": stage_print_config,
     }

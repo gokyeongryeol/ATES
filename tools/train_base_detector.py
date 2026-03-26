@@ -20,7 +20,6 @@ def main(args):
     model = YOLO(args.init_weight)
     model.train(
         trainer=CustomDetectionTrainer,
-        project=args.project_name,
         name=args.run_name,
         data=args.yaml_file,
         optimizer=args.optimizer,
@@ -30,18 +29,12 @@ def main(args):
         device=args.device,
         seed=args.seed,
         save_json=True,
-        save_dir=f"ckpt/yolo/{args.run_name}",
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # logging
-    parser.add_argument(
-        "--project-name",
-        type=str,
-        required=True,
-    )
     parser.add_argument(
         "--run-name",
         type=str,
@@ -50,7 +43,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--report-to",
         type=str,
-        default="wandb",
     )
 
     # data
