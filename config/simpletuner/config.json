@@ -3,6 +3,7 @@
     "--num_eval_images": 4,
     "--output_dir": "ckpt/flux/flux_fisheye8k",
     "--validation_prompt": "pedestrian, bike, car, bus, A photo taken with a fish-eye lens captures a busy city street with pedestrians crossing near a stopped bus, while a bicycle weaves between cars.",
+    "--report_to": "none",
     "--max_train_steps": 5000,
     "--num_train_epochs": 0,
     "--checkpointing_steps": 500,

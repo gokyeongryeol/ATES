@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
+# Detect if we're running from simpletuner subdirectory or git repo top level
+if [ -f "../config/config.env" ] && [ -f "train.py" ]; then
+    # We're in simpletuner/ subdirectory
+    cd ..
+fi
+
 # Pull config from config.env
-[ -f "config/simpletuner/config.env" ] && source config/simpletuner/config.env
+[ -f "config/config.env" ] && source config/config.env
 
 # If the user has not provided VENV_PATH, we will assume $(pwd)/.venv
 if [ -z "${VENV_PATH}" ]; then
@@ -15,14 +21,12 @@ if [ -z "${VENV_PATH}" ]; then
     fi
 fi
 
-# If a venv hasn't already been activated, activate it now when present.
-# Compose images install the required Python packages at build time and may not
-# provide a project-local venv.
-if [[ -z "${VIRTUAL_ENV}" && -n "${VENV_PATH}" && -f "${VENV_PATH}/bin/activate" ]]; then
+# If a venv hasn't already been activated, activate it now
+if [[ -z "${VIRTUAL_ENV}" ]]; then
     source "${VENV_PATH}/bin/activate"
 fi
 
-if [ -z "${DISABLE_LD_OVERRIDE}" ] && [ -n "${VENV_PATH}" ] && [ -d "${VENV_PATH}" ]; then
+if [ -z "${DISABLE_LD_OVERRIDE}" ]; then
     export NVJITLINK_PATH="$(find "${VENV_PATH}" -name nvjitlink -type d)/lib"
     # if it's not empty, we will add it to LD_LIBRARY_PATH at the front:
     if [ -n "${NVJITLINK_PATH}" ]; then
@@ -75,7 +79,14 @@ if [ -z "${ENV}" ]; then
 fi
 export ENV_PATH=""
 if [[ "$ENV" != "default" ]]; then
-    export ENV_PATH="${ENV}/"
+    # Handle backwards compatibility: if ENV starts with "examples/", redirect to simpletuner/examples/
+    if [[ "$ENV" == examples/* ]]; then
+        export ENV_PATH="simpletuner/${ENV}/"
+    else
+        export ENV_PATH="${ENV}/"
+    fi
+    [ -f "config/$ENV_PATH/config.env" ] && source "config/$ENV_PATH/config.env"
+
 fi
 
 if [ -z "${CONFIG_BACKEND}" ]; then
@@ -86,7 +97,12 @@ fi
 
 if [ -z "${CONFIG_BACKEND}" ]; then
     export CONFIG_BACKEND="env"
-    export CONFIG_PATH="config/${ENV_PATH}config"
+    # Handle examples path differently - look directly in the examples directory
+    if [[ "$ENV" == examples/* ]]; then
+        export CONFIG_PATH="${ENV_PATH}config"
+    else
+        export CONFIG_PATH="config/${ENV_PATH}config"
+    fi
     if [ -f "${CONFIG_PATH}.json" ]; then
         export CONFIG_BACKEND="json"
     elif [ -f "${CONFIG_PATH}.toml" ]; then
@@ -114,7 +130,17 @@ if [[ -z "${ACCELERATE_CONFIG_PATH}" ]]; then
         ACCELERATE_CONFIG_PATH="${HOME}/.cache/huggingface/accelerate/default_config.yaml"
     fi
 fi
+
+export PYTHONPATH="external/SimpleTuner/:${PYTHONPATH}"
+
 # Run the training script.
-accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}"   external/SimpleTuner/simpletuner/train.py
+if [ -f "${ACCELERATE_CONFIG_PATH}" ]; then
+    echo "Using Accelerate config file: ${ACCELERATE_CONFIG_PATH}"
+    accelerate launch --config_file="${ACCELERATE_CONFIG_PATH}" external/SimpleTuner/simpletuner/train.py
+else
+    echo "Accelerate config file not found: ${ACCELERATE_CONFIG_PATH}. Using values from config.env."
+    accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}" external/SimpleTuner/simpletuner/train.py
+
+fi
 
 exit 0

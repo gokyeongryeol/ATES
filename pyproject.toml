@@ -30,6 +30,7 @@ pseudo = [
     "numpy==1.26.4",
     "opencv-python==4.11.0.86",
 ]
+gen = []
 dpo = [
     "transformers==4.50.3",
     "accelerate==1.5.2",
