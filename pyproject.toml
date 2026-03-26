@@ -21,6 +21,7 @@ base = [
     "accelerate==1.5.2",
     "peft==0.17.1",
     "timm==1.0.19",
+    "datasets==3.5.0",
 ]
 pseudo = [
     "Pillow>=11.0.0",
@@ -32,7 +33,7 @@ pseudo = [
 ]
 gen = []
 dpo = [
-    "transformers==4.50.3",
+    "transformers==4.53.2",
     "accelerate==1.5.2",
     "datasets==3.5.0",
     "peft==0.17.1",
