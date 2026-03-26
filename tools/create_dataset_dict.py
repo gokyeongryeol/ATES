@@ -1,14 +1,20 @@
 import argparse
-import json
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from ates.io import write_json
 
 
 def main(json_path):
     dataset_dict = {
         "splits": ["train", "test"]
     }
-
-    with open(json_path, "w") as f:
-        json.dump(dataset_dict, f)
+    write_json(json_path, dataset_dict)
 
 
 if __name__ == "__main__":

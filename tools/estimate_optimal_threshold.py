@@ -2,14 +2,20 @@ import os
 from typing import Optional
 from pathlib import Path
 import argparse
-import json
+import sys
 import numpy as np
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 from ultralytics_custom.models.yolo.detect.val_from_coco_predictions import (
     DetectionValidatorFromCOCOPrediction,
 )
 from ultralytics_custom.pycocotools_custom.coco import COCO
 from ultralytics_custom.pycocotools_custom.cocoeval_modified import COCOeval
+from ates.io import load_json, write_json
 
 
 def find_optimal_threshold(gt_json: str, pred_json: str):
@@ -38,7 +44,7 @@ def main(
     save_pred_json: Optional[str] = None,
 ):
     coco_gt = COCO(gt_json)
-    pred_data = json.load(open(pred_json, "r"))
+    pred_data = load_json(pred_json)
     if isinstance(pred_data, dict) and "annotations" in pred_data:
         pred_data = pred_data["annotations"]
 
@@ -52,7 +58,7 @@ def main(
             str(x["id"]): conf_thresh for x in coco_gt.dataset["categories"]
         }
     elif conf_thresh_json is not None:
-        optimal_threshold_dict = json.load(open(conf_thresh_json, "r"))[
+        optimal_threshold_dict = load_json(conf_thresh_json)[
             Path(pred_json).stem
         ]
     else:
@@ -81,13 +87,11 @@ def main(
             "f1": float(coco_eval.stats[20]),
             "f1@0.5": float(coco_eval.stats[21]),
         }
-        with open(save_json, "w") as f:
-            json.dump(results, f, indent=4)
+        write_json(save_json, results, indent=4)
 
     if save_pred_json:
         os.makedirs(os.path.dirname(save_pred_json), exist_ok=True)
-        with open(save_pred_json, "w") as f:
-            json.dump(pred_data, f, indent=4)
+        write_json(save_pred_json, pred_data, indent=4)
 
 
 if __name__ == "__main__":

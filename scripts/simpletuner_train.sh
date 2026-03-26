@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
+# Detect if we're running from simpletuner subdirectory or git repo top level
+if [ -f "../config/config.env" ] && [ -f "train.py" ]; then
+    # We're in simpletuner/ subdirectory
+    cd ..
+fi
+
 # Pull config from config.env
-[ -f "config/simpletuner/config.env" ] && source config/simpletuner/config.env
+[ -f "config/config.env" ] && source config/config.env
 
 # If the user has not provided VENV_PATH, we will assume $(pwd)/.venv
 if [ -z "${VENV_PATH}" ]; then
@@ -73,7 +79,14 @@ if [ -z "${ENV}" ]; then
 fi
 export ENV_PATH=""
 if [[ "$ENV" != "default" ]]; then
-    export ENV_PATH="${ENV}/"
+    # Handle backwards compatibility: if ENV starts with "examples/", redirect to simpletuner/examples/
+    if [[ "$ENV" == examples/* ]]; then
+        export ENV_PATH="simpletuner/${ENV}/"
+    else
+        export ENV_PATH="${ENV}/"
+    fi
+    [ -f "config/$ENV_PATH/config.env" ] && source "config/$ENV_PATH/config.env"
+
 fi
 
 if [ -z "${CONFIG_BACKEND}" ]; then
@@ -84,7 +97,12 @@ fi
 
 if [ -z "${CONFIG_BACKEND}" ]; then
     export CONFIG_BACKEND="env"
-    export CONFIG_PATH="config/${ENV_PATH}config"
+    # Handle examples path differently - look directly in the examples directory
+    if [[ "$ENV" == examples/* ]]; then
+        export CONFIG_PATH="${ENV_PATH}config"
+    else
+        export CONFIG_PATH="config/${ENV_PATH}config"
+    fi
     if [ -f "${CONFIG_PATH}.json" ]; then
         export CONFIG_BACKEND="json"
     elif [ -f "${CONFIG_PATH}.toml" ]; then
@@ -112,7 +130,17 @@ if [[ -z "${ACCELERATE_CONFIG_PATH}" ]]; then
         ACCELERATE_CONFIG_PATH="${HOME}/.cache/huggingface/accelerate/default_config.yaml"
     fi
 fi
+
+export PYTHONPATH="external/SimpleTuner/:${PYTHONPATH}"
+
 # Run the training script.
-accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}"   external/SimpleTuner/train.py
+if [ -f "${ACCELERATE_CONFIG_PATH}" ]; then
+    echo "Using Accelerate config file: ${ACCELERATE_CONFIG_PATH}"
+    accelerate launch --config_file="${ACCELERATE_CONFIG_PATH}" external/SimpleTuner/simpletuner/train.py
+else
+    echo "Accelerate config file not found: ${ACCELERATE_CONFIG_PATH}. Using values from config.env."
+    accelerate launch ${ACCELERATE_EXTRA_ARGS} --mixed_precision="${MIXED_PRECISION}" --num_processes="${TRAINING_NUM_PROCESSES}" --num_machines="${TRAINING_NUM_MACHINES}" --dynamo_backend="${TRAINING_DYNAMO_BACKEND}" external/SimpleTuner/simpletuner/train.py
+
+fi
 
 exit 0

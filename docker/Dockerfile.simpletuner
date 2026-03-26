@@ -1,66 +1,60 @@
-# SimpleTuner needs CU141
-FROM nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu24.04
 
-# /workspace is the default volume for Runpod & other hosts
-WORKDIR /workspace
+# Hardware Architecture
+ENV TORCH_CUDA_ARCH_LIST=8.9
+ENV CUDA_HOME=/usr/local/cuda-12.8
+ENV LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/targets/x86_64-linux/lib/stubs:$LD_LIBRARY_PATH
 
-# Update apt-get
-RUN apt-get update -y
+# Settings
+ARG PYTHON_VERSION=3.12
+ENV DEBIAN_FRONTEND=noninteractive
+ENV HF_HOME=/workspace/huggingface
+ENV SIMPLETUNER_WORKSPACE=/workspace/simpletuner
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Prevents different commands from being stuck by waiting
-# on user input during build
-ENV DEBIAN_FRONTEND noninteractive
+WORKDIR /workspace/ATES
 
-# Install libg dependencies
-RUN apt install libgl1-mesa-glx -y
-RUN apt-get install 'ffmpeg'\
-    'libsm6'\
-    'libxext6'  -y
+# 1. System Dependencies
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    git-lfs \
+    wget \
+    curl \
+    vim \
+    tmux \
+    htop \
+    rsync \
+    net-tools \
+    openssh-server \
+    python${PYTHON_VERSION} \
+    python${PYTHON_VERSION}-dev \
+    python${PYTHON_VERSION}-venv \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    && rm -rf /var/lib/apt/lists/* \
+    && git lfs install
 
-# Install misc unix libraries
-RUN apt-get install -y --no-install-recommends openssh-server \
-                                               openssh-client \
-                                               git \
-                                               git-lfs \
-                                               wget \
-                                               curl \
-                                               tmux \
-                                               tldr \
-                                               nvtop \
-                                               vim \
-                                               rsync \
-                                               net-tools \
-                                               less \
-                                               iputils-ping \
-                                               7zip \
-                                               zip \
-                                               unzip \
-                                               htop \
-                                               inotify-tools
+# 2. Python Environment & Core Deps
+RUN python${PYTHON_VERSION} -m venv /opt/venv \
+    && pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir \
+       "huggingface_hub[cli,hf_transfer]" \
+       wandb \
+       mpi4py \
+       ninja
 
-# Set up git to support LFS, and to store credentials; useful for Huggingface Hub
-RUN git config --global credential.helper store && \
-    git lfs install
-
-# Install Python VENV
-RUN apt-get install -y python3.10-venv
-
-# Python
-RUN apt-get update -y && apt-get install -y python3 python3-pip
-RUN python3 -m pip install pip --upgrade
-
-# HF
-RUN pip3 install "huggingface_hub[cli]"
-
-# WanDB
-RUN pip3 install wandb
-
-# Clone SimpleTuner
-RUN git clone https://github.com/bghira/SimpleTuner --branch release \
+# 3. Install SimpleTuner
+# Using 'release' branch for stability. Change to 'main' for latest features.
+ARG SIMPLETUNER_BRANCH=release
+RUN git clone https://github.com/bghira/SimpleTuner --branch $SIMPLETUNER_BRANCH \
     && cd SimpleTuner \
-    && git checkout fae268e464dc51a1f9ac32ccc4af5b44ad382ba8 \
-    && cd ..
+    && pip install --no-cache-dir -e .[jxl] \
+    && pip install --no-build-isolation --no-cache-dir sageattention==1.0.6
 
-# Install SimpleTuner
-RUN pip3 install poetry
-RUN cd SimpleTuner && poetry install
+COPY pyproject.toml README.md ./
+COPY src ./src
+
+RUN pip install -e ".[gen]"
+

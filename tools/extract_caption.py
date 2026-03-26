@@ -1,6 +1,13 @@
 import argparse
 import os
-import json
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
 import torch
 import torchvision.transforms as T
 import transformers
@@ -13,22 +20,14 @@ from torchvision.transforms.functional import InterpolationMode
 from transformers import AutoTokenizer, AutoModel
 from PIL import Image
 
+from ates.io import load_json, write_json
+from ates.prompts import EXTRACTION_PROMPT
+
 transformers.utils.logging.set_verbosity(40)
 
 
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
-
-PROMPT = """
-You are an expert in generating high-quality image captions. Please analyze the provided fish-eye image in detail.
-Please adhere to the following format for the caption:
-- Start with ”A photo of”.
-- Limit the total length to 40-50 words.
-- Focus on bus, bike, car, pedestrian and truck.
-- Describe time of day, weather and location.
-- Focus on the scene inside the fish-eye lens.
-- Use grammatically correct and clear sentences.
-"""
 
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
@@ -119,7 +118,7 @@ def load_internvl(model_id, device):
 
 def predict_internvl(img_path, tokenizer, model, device):
     pixel_values = load_image(img_path, max_num=12).to(torch.bfloat16).to(device)
-    question = f"<image>\n{PROMPT}"
+    question = f"<image>\n{EXTRACTION_PROMPT}"
 
     generation_config = dict(max_new_tokens=1024, do_sample=True)
     output_text = model.chat(tokenizer, pixel_values, question, generation_config)
@@ -148,7 +147,7 @@ class CaptionAssistent:
         self.json_path = json_path
         self.output_path = output_path
 
-        self.data = json.load(open(self.json_path, 'r'))
+        self.data = load_json(self.json_path)
         self.image_dicts = self.data['images']
         self.dataset = ImgPathDataset(self.image_dicts, base_dir)
 
@@ -179,8 +178,7 @@ class CaptionAssistent:
 
         if self.accelerator.is_main_process:
             self.data['images'] = list(all_outputs)
-            with open(self.output_path, 'w') as f:
-                json.dump(self.data, f)
+            write_json(self.output_path, self.data)
 
 
 if __name__ == "__main__":

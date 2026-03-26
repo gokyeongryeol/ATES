@@ -1,44 +1,35 @@
 import argparse
 import os
-import json
+import sys
+from pathlib import Path
 from collections import defaultdict
 from tqdm import tqdm
 from datasets import Dataset
-from torch.utils.data import DataLoader
-import torch
 from ultralytics import YOLO
 from ultralytics.cfg import get_cfg
 from ultralytics.data import YOLODataset
 from ultralytics.data.utils import check_det_dataset
 
-PROMPT = """
-You are an expert in generating diverse yet realistic image captions for road scenes captured by a fish-eye surveillance camera.
-Your task is to rewrite the caption I give you into a realistic variant.
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
-Please adhere to the following format for the caption:
-- Start with ”A photo of”.
-- Limit the total length to 40-50 words.
-- Use grammatically correct and clear sentences.
-- While preserving the core elements (bus, bike, car, pedestrian, truck) of the original caption, vary:
-  - Camera angles: side-view or front-view
-  - Intersection types: T-junctions, Y-junctions, cross-intersections, mid-blocks, or pedestrian crossings
-  - Lighting: morning, afternoon, evening, or night
-  - Traffic flow: free-flowing, steady, or busy
-  - Scene content: object count/placement and background features (e.g., buildings, shops, trees, signs, utility poles)
-"""
+from ates.io import load_json
+from ates.prompts import DPO_SYSTEM_PROMPT
 
 
 def run_evaluation(json_path, base_dir, ckpt_dir, output_dir):
     device = "cuda"
 
-    data = json.load(open(json_path, 'r'))
+    data = load_json(json_path)
     fn_to_captions = {
         img_dict['file_name'].split('.')[0]: (img_dict['caption'], img_dict['rephrased'])
         for img_dict in data['images']
     }
 
     dataset = YOLODataset(
-        data=check_det_dataset(f"./config/ultralytics/fisheye8k.yaml"),
+        data=check_det_dataset("./config/ultralytics/fisheye8k.yaml"),
         img_path=os.path.join(base_dir, "images"),
         augment=False,
         imgsz=1280,
@@ -71,7 +62,7 @@ def run_evaluation(json_path, base_dir, ckpt_dir, output_dir):
         min_idx, max_idx = indices[0], indices[-1]
 
         preference['prompt'].append([
-            {"role": "system", "content": PROMPT},
+            {"role": "system", "content": DPO_SYSTEM_PROMPT},
             {"role": "user", "content": caption},
         ])
         preference['rejected'].append([

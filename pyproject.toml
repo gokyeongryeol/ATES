@@ -1,18 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "ultralytics_custom"
+name = "ates"
 version = "0.1.0"
 description = "Automatic Text-guided Edge-case Synthesis (ATES)"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
+    "PyYAML>=6.0.2",
+]
+
+[project.optional-dependencies]
+base = [
+    "Pillow>=11.0.0",
     "pycocotools>=2.0.10",
     "ultralytics==8.3.155",
     "transformers==4.50.3",
     "accelerate==1.5.2",
-    "diffusers==0.34.0",
-    "wandb>=0.20.1",
-    "flash-attn==2.8.2",
-    "datasets==3.5.0",
     "peft==0.17.1",
     "timm==1.0.19",
+    "datasets==3.5.0",
 ]
+pseudo = [
+    "Pillow>=11.0.0",
+    "pycocotools>=2.0.10",
+    "ultralytics==8.3.155",
+    "timm==1.0.19",
+    "numpy==1.26.4",
+    "opencv-python==4.11.0.86",
+]
+gen = []
+dpo = [
+    "transformers==4.53.2",
+    "accelerate==1.5.2",
+    "datasets==3.5.0",
+    "peft==0.17.1",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

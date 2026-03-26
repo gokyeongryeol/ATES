@@ -1,4 +1,11 @@
 import argparse
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 from ultralytics import YOLO, SETTINGS
 from ultralytics_custom.models.yolo.detect import CustomDetectionTrainer
@@ -13,7 +20,6 @@ def main(args):
     model = YOLO(args.init_weight)
     model.train(
         trainer=CustomDetectionTrainer,
-        project=args.project_name,
         name=args.run_name,
         data=args.yaml_file,
         optimizer=args.optimizer,
@@ -23,18 +29,12 @@ def main(args):
         device=args.device,
         seed=args.seed,
         save_json=True,
-        save_dir=f"ckpt/yolo/{args.run_name}",
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # logging
-    parser.add_argument(
-        "--project-name",
-        type=str,
-        required=True,
-    )
     parser.add_argument(
         "--run-name",
         type=str,
@@ -43,7 +43,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--report-to",
         type=str,
-        default="wandb",
     )
 
     # data

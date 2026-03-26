@@ -1,146 +1,127 @@
-# Automatic Text-guided Edge-case Synthesis (ATES)
+# ATES: Automatic Text-guided Edge-case Synthesis
 
-## Preparation
+## Setup
 
-### 1. Dataset
-- Download [FishEye8K](https://github.com/MoyoG/FishEye8K?tab=readme-ov-file) dataset and place it into `/mnt/data/FishEye8K/`
-- Split `train` folder of `/mnt/data/FishEye8K/` into `train-D` and `train-R` based on camera IDs referred from image file names
-    - `train-D`: {5, 6, 8, 9, 10, 13, 14, 15, 16, 17}
-    - `train-R`: {3, 11, 12, 18}
+Dataset root is expected at `/mnt/data/FishEye8K` with:
 
-### 2. Install
-- Make base container
-    ```bash
-    cd docker
-    docker build -t img-base -f Dockerfile .
-    docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_base_lab img-base /bin/bash
-    ```
-- git clone to any directory within `/mnt/` and setup with an editable mode
-    ```bash
-    pip install -e .
-    ```
-- Substitute default config file of `ultralytics` to `src/ultralytics_custom/cfg/default_backup.yaml`
-- Login to huggingface and wandb by cli
+```text
+train-D/{images/,labels/, train-D.json}
+train-R/{images/, labels/, train-R.json}
+test/{images/, labels/, test.json}
+```
 
-### 3. Submodules
-- Initialize
-    ```bash
-    git submodule init
-    git submodule update
-    ```
-- Make separate containers
-    -  To be used to train Co-DETR
-        ```bash
-        docker build -t img-pseudo -f Dockerfile.mmdetection .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_pseudo_lab img-pseudo /bin/bash
-        ```
-    - To be used to train Flux.1-dev
-        ```bash
-        docker build -t img-gen -f Dockerfile.simpletuner .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_gen_lab img-gen /bin/bash
-        ```
-    - To be used to train LLAMA3
-        ```bash
-        docker build -t img-rephrase -f Dockerfile.trl .
-        docker run -it -v /mnt/:/mnt/ --shm-size=8G --gpus=all --restart=always --name ates_rephrase_lab img-rephrase /bin/bash
-        ```
-- Login to huggingface and wandb by cli
+- Make `train-D_for_gen/images` copied from `train-D/images`
+- For each image file (e.g. camera5_A_0.png) in `train-D_for_gen/images`, make a corresponding text file (e.g. camera5_A_0.txt) with category names and caption of the image as following:
+```bash
+echo "bike, truck, car, A photo of an urban intersection with crosswalks and traffic lanes. Vehicles and bicycles are visible near a tall building. The fish-eye lens captures a wide view, including nearby greenery and infrastructure." > camera5_A_0.txt
+```
+
+Initialize submodules before building:
+
+```bash
+git submodule update --init --recursive
+```
+
+Edit `config/ates/default.yaml` for:
+
+- `paths.data_root`
+- `checkpoints.codetr_finetuned`
+- `checkpoints.flux_adapter`
+- `checkpoints.automatic_rephraser`
+- distributed settings
+
+## Docker Compose
+
+Build and start all services:
+
+```bash
+docker compose build
+docker compose up -d
+```
+
+Services:
+
+- `base`: Captioning by InternVL3, Rephrasing by Llama3, YOLOv11 training and evaluation
+- `pseudo`: Co-DETR training, pseudo labeling, and thresholding
+- `gen`: Flux training
+- `dpo`: Llama3 training
+
+[Note] `base`, `gen`, and `dpo` requires huggingface-cli login for model access.
 
 
-## Pipeline
+## Step-by-step
 
-### 1. Train a high-quality pseudo-labeler
-- Switch to `ates_pseudo_lab` and move to the cloned directory
-- Download the pretrained ckpt
-    ```bash
-    wget -P ckpt/codetr/ https://download.openmmlab.com/mmdetection/v3.0/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth
-    ```
-- Update line 9 of `external/mmdetection/mmdet/__init__.py` and `/mmdetection/mmdet/__init__.py` to
-    ```python
-    mmcv_maximum_version = '2.2.1'
-    ```
-- Train Co-DETR
-    ```bash
-    bash scripts/mmdetection_train.sh
-    ```
-- Update `CHECKPOINT` in `scripts/obtain_pseudo_label.sh` and `scripts/obtain_tmp_pseudo_label.sh`
-- Estimate the temporary pseudo-labels (with low score threshold)
-    ```bash
-    bash scripts/obtain_tmp_pseudo_label.sh
-    ```
-- Switch to `ates_base_lab` and move to the cloned directory
-- Estimate the class-wise optimal score threshold
-    ```bash
-    bash scripts/estimate_optimal_threshold.sh
-    ```
+Render derived configs:
 
-### 2. Train a text-to-image model
-- Make `train-D_for_gen` folder in `/mnt/data/FishEye8K/`
-    - copy `images` folder from `train-D` to `train-D_for_gen`
-    - for each image file (e.g. `camera5_A_0.png`) within `images`, make a corresponding text file (e.g. `camera5_A_0.txt`)
-    - fill the text file with category names and caption of the image
-        ```bash
-        echo "bike, truck, car, A photo of an urban intersection with crosswalks and traffic lanes. Vehicles and bicycles are visible near a tall building. The fish-eye lens captures a wide view, including nearby greenery and infrastructure." > camera5_A_0.txt
-        ```
-- Switch to `ates_gen_lab` and move to the cloned directory
-- Train Flux.1-dev
-    ```bash
-    ENV=simpletuner bash scripts/simpletuner_train.sh
-    ```
-- Update `GEN_MODEL_CKPT` in `scripts/synthesize_from_text.sh`
+```bash
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py render-configs"
+```
 
-### 3. Extract caption and its rephrased versions
-- Switch to `ates_base_lab` and move to the cloned directory
-- Inference with InternVL3-38B and LLAMA3-8B-Instruct
-    ```bash
-    bash scripts/extract_and_rephrase.sh
-    ```
+This writes derived configs into `config/ultralytics/` and `config/mmdetection/`.
 
-### 4. Synthesize images from captions
-- Switch to `ates_gen_lab` and move to the cloned directory
-- Inference with the trained Flux.1-dev
-    ```bash
-    bash scripts/synthesize_from_text.sh
-    ```
-- Switch to `ates_pseudo_lab` and move to the cloned directory
-- Inference with the trained Co-DETR
-    ```bash
-    bash scripts/obtain_pseudo_label.sh
-    ```
+1. Train Co-DETR
 
-### 5. Train a discriminative model
-- Switch to `ates_base_lab` and move to the cloned directory
-- Train YOLO11-s
-    ```bash
-    bash scripts/ultralytics_train.sh
-    ```
+```bash
+docker compose exec pseudo bash -lc "cd /workspace/ATES && mkdir -p ckpt/codetr && test -f ckpt/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth || wget -P ckpt/codetr/ https://download.openmmlab.com/mmdetection/v3.0/codetr/co_dino_5scale_swin_large_16e_o365tococo-614254c9.pth"
+docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py mmdet-train"
+python tools/update_experiment_config.py --key checkpoints.codetr_finetuned --glob "ckpt/codetr/codetr_fisheye8k/best_coco_bbox_mAP_epoch_*.pth" --expect file
+docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py obtain-tmp-pseudo"
+docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py estimate-threshold"
+```
 
-### 6. Construct a preference dataset
-- Switch to `ates_base_lab` and move to the cloned directory
-- Evaluate the edge-ness and assign binary labels of preference
-    ```bash
-    bash scripts/construct_dataset.sh
-    ```
+2. Train Flux
 
-### 7. Apply preference learning to rephraser
-- Switch to `ates_rephrase_lab` and move to the cloned directory
-- Update data loading codes of `external/trl/trl/scripts/dpo.py` to
-    ```python
-    from datasets import load_from_disk
-    dataset = load_from_disk(script_args.dataset_name)
-    ```
-- Train LLAMA3
-    ```bash
-    bash scripts/trl_train.sh
-    ```
-- Update `AUT_V1_MODEL_CKPT` in `scripts/extract_and_rephrase.sh`
+```bash
+docker compose exec gen bash -lc "cd /workspace/ATES && ENV=simpletuner bash scripts/simpletuner_train.sh"
+python tools/update_experiment_config.py --key checkpoints.flux_adapter --glob "ckpt/flux/**/checkpoint-*" --expect dir
+```
 
-### 8. Augment the train dataset with the tuned rephraser
-- Go back to Step 3,4,5 uncommenting scripts for "automatic_v1" and commenting others
+3. Extract captions and rephrase
 
-### 9. Evaluate the augmented train dataset
-- Switch to `ates_base_lab` and move to the cloned directory
-- Compute mAP or mAP w/o TP of YOLO11-s
-    ```bash
-    bash scripts/eval_metrics.sh
-    ```
+```bash
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py extract-and-rephrase"
+```
+
+4. Synthesize and pseudo-label generated data
+
+```bash
+docker compose exec gen bash -lc "cd /workspace/ATES && python tools/run_experiment.py synthesize"
+docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py obtain-pseudo"
+```
+
+5. Train YOLOv11 and build preference data
+
+```bash
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-yolo"
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py construct-preference"
+```
+
+6. Train Llama3
+
+```bash
+docker compose exec dpo bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-llama"
+python tools/update_experiment_config.py --key checkpoints.automatic_rephraser --glob "ckpt/llama/llama_dpo_fisheye8k_with_naive_v0/checkpoint-*" --expect dir
+```
+
+7. Add automatic v1
+
+```bash
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py extract-and-rephrase --include-automatic-v1"
+docker compose exec gen bash -lc "cd /workspace/ATES && python tools/run_experiment.py synthesize --include-automatic-v1"
+docker compose exec pseudo bash -lc "cd /workspace/ATES && python tools/run_experiment.py obtain-pseudo --include-automatic-v1"
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py train-yolo --config fisheye8k_with_naive_v0+automatic_v1"
+```
+
+8. Evaluate YOLOv11
+
+```bash
+docker compose exec base bash -lc "cd /workspace/ATES && python tools/run_experiment.py eval"
+```
+
+## One-shot Orchestration
+
+Run the full pipeline with compose-based service switching:
+
+```bash
+bash scripts/run_full_experiment.sh
+```
