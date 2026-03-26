@@ -206,7 +206,7 @@ main() {
     require_file "${REPO_DIR}/external/mmdetection/tools/dist_train.sh"
     require_file "${REPO_DIR}/external/trl/pyproject.toml"
 
-    maybe_build_and_start_containers
+    # maybe_build_and_start_containers
 
     log "Verifying Python environments in compose services"
     verify_python_imports "${BASE_SERVICE}" "import yaml, ultralytics, transformers, accelerate, peft, timm"
