@@ -49,7 +49,7 @@ def main(
     # load validator
     custom = {"rect": True}
     kwargs = {"data": data_yaml, "save_json": True}
-    args = {**model.overrides, **custom, **kwargs, "mode": "val", "eval_imgsz": imgsz, "plots": True}
+    args = {**model.overrides, **custom, **kwargs, "mode": "val", "plots": True}
 
     if ref_model_path is None:
         validator = DetectionValidator(args=args, _callbacks=model.callbacks)
