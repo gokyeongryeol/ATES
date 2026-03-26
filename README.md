@@ -1,13 +1,19 @@
-# Automatic Text-guided Edge-case Synthesis (ATES)
+# ATES: Automatic Text-guided Edge-case Synthesis
 
 ## Setup
 
 Dataset root is expected at `/mnt/data/FishEye8K` with:
 
 ```text
-train-D/{images,train-D.json}
-train-R/{images,train-R.json}
-test/{images,test.json}
+train-D/{images/,labels/, train-D.json}
+train-R/{images/, labels/, train-R.json}
+test/{images/, labels/, test.json}
+```
+
+- Make `train-D_for_gen/images` copied from `train-D/images`
+- For each image file (e.g. camera5_A_0.png) in `train-D_for_gen/images`, make a corresponding text file (e.g. camera5_A_0.txt) with category names and caption of the image as following:
+```bash
+echo "bike, truck, car, A photo of an urban intersection with crosswalks and traffic lanes. Vehicles and bicycles are visible near a tall building. The fish-eye lens captures a wide view, including nearby greenery and infrastructure." > camera5_A_0.txt
 ```
 
 Initialize submodules before building:
@@ -40,8 +46,10 @@ Services:
 - `gen`: Flux training
 - `dpo`: Llama3 training
 
+[Note] `base`, `gen`, and `dpo` requires huggingface-cli login for model access.
 
-## Reproduce
+
+## Step-by-step
 
 Render derived configs:
 
